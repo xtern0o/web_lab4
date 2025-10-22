@@ -10,6 +10,10 @@ public class AreaCheckService {
         float y = pointRequestDTO.getY();
         float r = pointRequestDTO.getR();
 
-        return true;
+        if (x > 0 && y > 0) return false;
+        else if (x <= 0 && y > 0) return y <= x + r / 2;
+        else if (x <= 0 && y <= 0) return x >= -r && y >= -r / 2;
+        else return x * x + y * y <= (r / 2) * (r / 2);
+
     }
 }

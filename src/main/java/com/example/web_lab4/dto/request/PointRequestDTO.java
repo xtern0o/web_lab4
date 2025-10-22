@@ -18,19 +18,19 @@ public class PointRequestDTO {
     @Null(groups = OnCreate.class)
     private Long id;
 
-    @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @DecimalMin(value = "-5.0", groups = {OnCreate.class, OnUpdate.class})
-    @DecimalMax(value = "3.0", groups = {OnCreate.class, OnUpdate.class})
+    @NotNull
+    @DecimalMin(value = "-5.0")
+    @DecimalMax(value = "3.0")
     private Float x;
 
-    @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @DecimalMin(value = "-5.0", groups = {OnCreate.class, OnUpdate.class})
-    @DecimalMax(value = "3.0", groups = {OnCreate.class, OnUpdate.class})
+    @NotNull
+    @DecimalMin(value = "-5.0")
+    @DecimalMax(value = "3.0")
     private Float y;
 
-    @NotNull(groups = {OnCreate.class, OnUpdate.class})
-    @DecimalMin(value = "-5.0", groups = {OnCreate.class, OnUpdate.class})
-    @DecimalMax(value = "3.0", groups = {OnCreate.class, OnUpdate.class})
+    @NotNull
+    @DecimalMin(value = "-5.0")
+    @DecimalMax(value = "3.0")
     private Float r;
 
 }
