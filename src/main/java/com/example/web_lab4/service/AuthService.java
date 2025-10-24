@@ -6,6 +6,7 @@ import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.security.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,8 @@ public class AuthService {
      * @return JWT-токен
      */
     public JwtResponseDto signIn(UserRequestDto userRequestDto) {
+        if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) throw new BadCredentialsException("Вы уже авторизованы");
+
         UserEntity userEntity = userService.getByUsername(userRequestDto.getName());
 
         if (!passwordEncoder.matches(userRequestDto.getPassword(), userEntity.getPassword())) {

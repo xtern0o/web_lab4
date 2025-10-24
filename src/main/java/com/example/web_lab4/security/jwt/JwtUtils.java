@@ -1,6 +1,7 @@
 package com.example.web_lab4.security.jwt;
 
 import com.example.web_lab4.entity.UserEntity;
+import com.example.web_lab4.service.TokenBlackListService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Component
@@ -29,8 +31,11 @@ public class JwtUtils {
      * @return jwt токен
      */
     public String generateToken(UserEntity userEntity) {
+        String jti = UUID.randomUUID().toString();
+
         Claims claims = Jwts.claims()
                 .subject(userEntity.getUsername())
+                .id(jti)
                 .add("userId", userEntity.getId())
                 .add("role", userEntity.getRole().name())
                 .build();
@@ -80,6 +85,7 @@ public class JwtUtils {
 
     public boolean isValidToken(String token) {
         try {
+
             Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
@@ -88,6 +94,15 @@ public class JwtUtils {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Уникальный JTI для того чтобы не хранить целиком токены в блеклисте
+     * @param token токен
+     * @return JTI
+     */
+    public String getJti(String token) {
+        return getClaim(token, Claims::getId);
     }
 
     public String getUsername(String token) {

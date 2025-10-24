@@ -2,6 +2,8 @@ package com.example.web_lab4.security.filter;
 
 import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.security.jwt.JwtUtils;
+import com.example.web_lab4.service.TokenBlackListService;
+import com.example.web_lab4.service.UserDetailsServiceImpl;
 import com.example.web_lab4.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,7 +24,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
-    private final UserService userService;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final TokenBlackListService tokenBlackListService;
 
     @Override
     protected void doFilterInternal(
@@ -35,16 +38,23 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (!jwtUtils.isValidToken(token)) {
+        if (tokenBlackListService.isBlacklisted(token) || !jwtUtils.isValidToken(token)) {
             filterChain.doFilter(request, response);
             return;
         }
         String username = jwtUtils.getUsername(token);
-        UserDetails user = userService.loadUserByUsername(username);
+        UserDetails user = userDetailsService.loadUserByUsername(username);
+
+        System.out.println("=========== TOKEN ===========");
+        System.out.println("=========== USERNAME: " + username);
+
 
         var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        System.out.println("=========== AUTH ENABLED ===========");
+
 
         filterChain.doFilter(request, response);
     }
