@@ -1,5 +1,6 @@
 package com.example.web_lab4.entity;
 
+import com.example.web_lab4.entity.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,16 +25,19 @@ public class UserEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<PointEntity> points;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO: разобраться и написать че здесь надо
-        return List.of();
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override

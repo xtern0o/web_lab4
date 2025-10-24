@@ -1,8 +1,8 @@
 package com.example.web_lab4.controllers;
 
 import com.example.web_lab4.dto.groups.OnCreate;
-import com.example.web_lab4.dto.request.PointRequestDTO;
-import com.example.web_lab4.dto.response.PointResponseDTO;
+import com.example.web_lab4.dto.request.PointRequestDto;
+import com.example.web_lab4.dto.response.PointResponseDto;
 import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.service.PointService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class PointController {
     private final PointService pointService;
 
     @GetMapping
-    public List<PointResponseDTO> getPoints(
+    public List<PointResponseDto> getPoints(
             @RequestParam(name = "user_id", required = false) Long userId
     ) {
         if (userId != null) return pointService.getAllPointsByUserId(userId);
@@ -28,8 +28,8 @@ public class PointController {
     }
 
     @PostMapping
-    public PointResponseDTO createPoint(
-            @Validated(OnCreate.class) @RequestParam PointRequestDTO requestDTO,
+    public PointResponseDto createPoint(
+            @Validated(OnCreate.class) @RequestParam PointRequestDto requestDTO,
             @AuthenticationPrincipal UserEntity currentUser
     ) {
         return pointService.createPoint(requestDTO, currentUser);

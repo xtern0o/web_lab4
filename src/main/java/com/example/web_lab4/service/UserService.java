@@ -1,11 +1,10 @@
 package com.example.web_lab4.service;
 
-import com.example.web_lab4.dto.request.UserRequestDTO;
-import com.example.web_lab4.dto.response.UserResponseDTO;
+import com.example.web_lab4.dto.request.UserRequestDto;
 import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.mapping.UserMapper;
 import com.example.web_lab4.repository.UserRepository;
-import com.example.web_lab4.utils.exception.AuthException;
+import com.example.web_lab4.exception.UserAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,21 +19,27 @@ public class UserService implements UserDetailsService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    public UserResponseDTO registerUser(UserRequestDTO requestDTO) {
+    public UserEntity createUser(UserRequestDto requestDTO) {
         if (userRepository.existsByName(requestDTO.getName())) {
-            throw new AuthException("Пользователь с именем %s уже существует", requestDTO.getName());
+            throw new UserAlreadyExistsException(requestDTO.getName());
         }
 
         UserEntity userEntity = userMapper.toEntity(requestDTO);
         userEntity.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
 
-        userRepository.save(userEntity);
+        return userRepository.save(userEntity);
+    }
 
-        return userMapper.toResponseDTO(userEntity);
+    public UserEntity getByUsername(String username) {
+        return userRepository.findByName(username).orElseThrow(
+                () -> new UsernameNotFoundException(
+                        String.format("Пользователь с именем '%s' не найден", username)
+                )
+        );
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByName(username).orElseThrow(() -> new UsernameNotFoundException("Пользователь \"" + username + "\" не найден"));
+        return getByUsername(username);
     }
 }

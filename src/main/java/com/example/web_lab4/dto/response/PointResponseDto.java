@@ -8,7 +8,7 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PointResponseDTO {
+public class PointResponseDto {
     @NotNull
     private Long id;
 

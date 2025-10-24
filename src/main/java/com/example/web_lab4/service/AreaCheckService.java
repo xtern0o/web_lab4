@@ -1,11 +1,11 @@
 package com.example.web_lab4.service;
 
-import com.example.web_lab4.dto.request.PointRequestDTO;
+import com.example.web_lab4.dto.request.PointRequestDto;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AreaCheckService {
-    public boolean isHit(PointRequestDTO pointRequestDTO) {
+    public boolean isHit(PointRequestDto pointRequestDTO) {
         float x = pointRequestDTO.getX();
         float y = pointRequestDTO.getY();
         float r = pointRequestDTO.getR();
