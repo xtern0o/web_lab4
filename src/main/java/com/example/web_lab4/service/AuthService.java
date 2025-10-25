@@ -3,6 +3,7 @@ package com.example.web_lab4.service;
 import com.example.web_lab4.dto.request.UserRequestDto;
 import com.example.web_lab4.dto.response.JwtResponseDto;
 import com.example.web_lab4.entity.UserEntity;
+import com.example.web_lab4.exception.exceptions.AlreadyAuthenticatedException;
 import com.example.web_lab4.security.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -36,10 +37,7 @@ public class AuthService {
      * @return JWT-токен
      */
     public JwtResponseDto signIn(UserRequestDto userRequestDto) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-            throw new BadCredentialsException("Вы уже авторизованы");
-        }
+        if (isAuthenticated()) throw new AlreadyAuthenticatedException(userService.getByUsername(userRequestDto.getName()));
 
         UserEntity userEntity = userService.getByUsername(userRequestDto.getName());
 
@@ -49,6 +47,11 @@ public class AuthService {
 
         String jwt = jwtUtils.generateToken(userEntity);
         return new JwtResponseDto(jwt);
+    }
+
+    public boolean isAuthenticated() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
     }
 
 }

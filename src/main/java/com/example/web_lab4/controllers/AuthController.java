@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-    private final JwtUtils jwtUtils;
 
     @PostMapping("/signup")
     public JwtResponseDto signUp(@RequestBody UserRequestDto userRequestDto) {

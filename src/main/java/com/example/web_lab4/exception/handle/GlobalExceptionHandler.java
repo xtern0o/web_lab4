@@ -1,5 +1,6 @@
 package com.example.web_lab4.exception.handle;
 
+import com.example.web_lab4.exception.exceptions.AlreadyAuthenticatedException;
 import com.example.web_lab4.exception.exceptions.JwtExpiredException;
 import com.example.web_lab4.exception.exceptions.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,16 @@ public class GlobalExceptionHandler {
         return body;
     }
 
+    private Map<String, Object> defaultInfoHandler(Exception e, HttpStatus status) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("statusCode", status.value());
+        body.put("status", status);
+        body.put("info", e.getMessage());
+
+        return body;
+    }
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public Map<String, Object> handleUserAlreadyExists(UserAlreadyExistsException e) {
         return defaultErrorHandler(e, HttpStatus.CONFLICT);
@@ -53,5 +64,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JwtExpiredException.class)
     public Map<String, Object> handleIllegalAccess(JwtExpiredException e) {
         return defaultErrorHandler("Срок действия JWT-токена истек. Подробнее: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AlreadyAuthenticatedException.class)
+    public Map<String, Object> handleAlreadyAuthenticated(AlreadyAuthenticatedException e) {
+        return defaultErrorHandler(e, HttpStatus.FOUND);
     }
 }
