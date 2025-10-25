@@ -68,6 +68,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AlreadyAuthenticatedException.class)
     public Map<String, Object> handleAlreadyAuthenticated(AlreadyAuthenticatedException e) {
-        return defaultErrorHandler(e, HttpStatus.FOUND);
+        return defaultInfoHandler(e, HttpStatus.FOUND);
     }
 }
