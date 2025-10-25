@@ -5,6 +5,7 @@ import com.example.web_lab4.dto.response.JwtResponseDto;
 import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.security.jwt.JwtUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +36,10 @@ public class AuthService {
      * @return JWT-токен
      */
     public JwtResponseDto signIn(UserRequestDto userRequestDto) {
-        if (SecurityContextHolder.getContext().getAuthentication().isAuthenticated()) throw new BadCredentialsException("Вы уже авторизованы");
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
+            throw new BadCredentialsException("Вы уже авторизованы");
+        }
 
         UserEntity userEntity = userService.getByUsername(userRequestDto.getName());
 

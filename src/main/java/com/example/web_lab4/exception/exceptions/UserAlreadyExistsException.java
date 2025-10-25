@@ -1,4 +1,4 @@
-package com.example.web_lab4.exception;
+package com.example.web_lab4.exception.exceptions;
 
 import org.springframework.security.core.AuthenticationException;
 

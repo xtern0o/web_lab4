@@ -19,7 +19,6 @@ public class AuthController {
 
     @PostMapping("/signup")
     public JwtResponseDto signUp(@RequestBody UserRequestDto userRequestDto) {
-        System.out.println("=== SIGNUP CONTROLLER CALLED ===");
         return authService.signUp(userRequestDto);
     }
 

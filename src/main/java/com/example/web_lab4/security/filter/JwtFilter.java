@@ -1,10 +1,12 @@
 package com.example.web_lab4.security.filter;
 
 import com.example.web_lab4.entity.UserEntity;
+import com.example.web_lab4.exception.exceptions.JwtExpiredException;
 import com.example.web_lab4.security.jwt.JwtUtils;
 import com.example.web_lab4.service.TokenBlackListService;
 import com.example.web_lab4.service.UserDetailsServiceImpl;
 import com.example.web_lab4.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,27 +35,27 @@ public class JwtFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        String token = jwtUtils.extractJwtFromRequest(request).orElse(null);
-        if (token == null) {
-            filterChain.doFilter(request, response);
-            return;
+        try {
+            String token = jwtUtils.extractJwtFromRequest(request).orElse(null);
+            if (token == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            if (tokenBlackListService.isBlacklisted(token) || !jwtUtils.isValidToken(token)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            String username = jwtUtils.getUsername(token);
+            UserDetails user = userDetailsService.loadUserByUsername(username);
+
+            var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        } catch (ExpiredJwtException expiredJwtException) {
+            throw new JwtExpiredException(expiredJwtException.getMessage(), expiredJwtException);
         }
-        if (tokenBlackListService.isBlacklisted(token) || !jwtUtils.isValidToken(token)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        String username = jwtUtils.getUsername(token);
-        UserDetails user = userDetailsService.loadUserByUsername(username);
 
-        System.out.println("=========== TOKEN ===========");
-        System.out.println("=========== USERNAME: " + username);
-
-
-        var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        System.out.println("=========== AUTH ENABLED ===========");
 
 
         filterChain.doFilter(request, response);

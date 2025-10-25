@@ -1,5 +1,7 @@
-package com.example.web_lab4.exception;
+package com.example.web_lab4.exception.handle;
 
+import com.example.web_lab4.exception.exceptions.JwtExpiredException;
+import com.example.web_lab4.exception.exceptions.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +25,16 @@ public class GlobalExceptionHandler {
         return body;
     }
 
+    private Map<String, Object> defaultErrorHandler(String message, HttpStatus status) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", Instant.now());
+        body.put("statusCode", status.value());
+        body.put("status", status);
+        body.put("error", message);
+
+        return body;
+    }
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public Map<String, Object> handleUserAlreadyExists(UserAlreadyExistsException e) {
         return defaultErrorHandler(e, HttpStatus.CONFLICT);
@@ -36,5 +48,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public Map<String, Object> handleUserNotFound(UsernameNotFoundException e) {
         return defaultErrorHandler(e, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(JwtExpiredException.class)
+    public Map<String, Object> handleIllegalAccess(JwtExpiredException e) {
+        return defaultErrorHandler("Срок действия JWT-токена истек. Подробнее: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }

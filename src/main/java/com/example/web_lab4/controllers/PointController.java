@@ -7,6 +7,7 @@ import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +30,9 @@ public class PointController {
 
     @PostMapping
     public PointResponseDto createPoint(
-            @Validated(OnCreate.class) @RequestParam PointRequestDto requestDTO,
-            @AuthenticationPrincipal UserEntity currentUser
+            @Validated(OnCreate.class) @RequestBody PointRequestDto requestDTO,
+            @AuthenticationPrincipal UserDetails currentUser
     ) {
-        return pointService.createPoint(requestDTO, currentUser);
+        return pointService.createPoint(requestDTO, (UserEntity) currentUser);
     }
 }
