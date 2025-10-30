@@ -74,11 +74,13 @@ body {
   border-radius: 4px;
 
   &-header {
+    background-color: @bg-secondary;
     display: flex;
     align-items: center;
     font-weight: 400;
     font-size: 1.5rem;
     padding: 0.5rem 1rem;
+    margin: 0 0;
     color: @text-primary;
     border-bottom: 1px solid @bg-tertiary; 
   }
@@ -136,6 +138,11 @@ header {
   z-index: 1000;
   backdrop-filter: blur(10px);
 
+  .here {
+    color: @accent !important;
+    border-bottom: 2px solid @accent;
+  }
+
   .navbar {
     display: flex;
     align-items: center;
@@ -153,8 +160,7 @@ header {
         font-weight: 700;
         align-items: center;
         margin: 0;
-        padding: 0 0.5rem;
-      
+        padding: 0 0.5rem;     
       }
     }
 
@@ -216,5 +222,9 @@ main {
   #clock-canvas:hover {
       transform: scale(1.1);
       box-shadow: 0 8px 25px @bg-tertiary
+  }
+
+  .inline-img-text-grid {
+    .grid-proportions(~"50px 1fr", 1rem);
   }
 }

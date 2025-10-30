@@ -16,11 +16,11 @@ import Home from './components/Home.vue';
             <p class="navbar-brand-link">Карнажицкий Максим Романович</p>
             <p class="navbar-brand-link">Лаб 4</p>
             <p class="navbar-brand-link">8281</p>
-
+          
           </div>
           <nav class="navbar-nav">
-            <a class="navbar-nav-item-link" href="google.com">Главная</a>
-            <a class="navbar-nav-item-link" href="google.com">Точки</a>
+            <router-link class="navbar-nav-item-link" to="/" exact-active-class="here">Главная</router-link>
+            <router-link class="navbar-nav-item-link" to="/points" exact-active-class="here">Точки</router-link>
           </nav>
           
         </div>
@@ -29,7 +29,7 @@ import Home from './components/Home.vue';
     
     <main>
       <div class="container">
-        <Home />
+        <router-view />
       </div>
     </main>
 
