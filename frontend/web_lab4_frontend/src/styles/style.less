@@ -1,0 +1,220 @@
+@bg-primary: #121212;
+@bg-secondary: #1e1e1e;
+@bg-tertiary: #2d2d2d;
+@text-primary: #e1e1e1;
+@text-secondary: #888;
+@accent: #6366f1;
+@accent-hover: #4f46e5;
+@success: #10b981;
+@warning: #f59e0b;
+@error: #ef4444;
+
+@cont-max-width: 1200px;
+@cont-gutter: 1rem;
+
+@width-phone: 660px;
+@width-tablet: 1277px;
+
+// mixins
+
+.grid-proportions(@cols-values, @gap: 1rem) {
+  display: grid;
+  grid-template-columns: @cols-values;
+  gap: @gap;
+  width: 100%;
+
+}
+
+.grid-proportions-adaptive(@cols-values, @gap: 1rem) {
+  display: grid;
+  grid-template-columns: @cols-values;
+  gap: @gap;
+  width: 100%;
+
+  @media(max-width: @width-phone) {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+
+
+// base
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: @bg-primary;
+  color: @text-primary;
+}
+
+.container {
+  width: 100%;
+  max-width: @cont-max-width;
+  margin: 0 auto;
+  padding: 0 @cont-gutter;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid @bg-tertiary;
+  border-radius: 4px;
+
+  &-header {
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    color: @text-primary;
+    border-bottom: 1px solid @bg-tertiary; 
+  }
+
+  &-body {
+    color: @text-secondary;
+    font-size: 1rem;
+  }
+}
+
+// Headers
+
+h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 2rem 0;
+  padding-bottom: 2rem;
+  line-height: 1.2;
+  color: @text-primary;
+}
+
+h2 {
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: left;
+  padding: 2rem 1rem;
+  padding-bottom: 2rem;
+  line-height: 1.2;
+  color: @text-primary;
+}
+
+h3 {
+  font-size: 2rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 0 1rem 0;
+  padding-bottom: 2rem;
+  color: @text-primary;
+}
+
+p {
+  margin: 0 0 1rem 0;
+  padding: 0 1rem;
+  line-height: 1.6;
+  font-size: 1rem;
+  color: @text-secondary;
+}
+
+header {
+  background-color: @bg-secondary;
+  border-bottom: 1px solid @bg-tertiary;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 auto;
+    padding: 0;
+    height: 70px;
+
+    &-brand {
+      display: flex;
+      align-items: center;
+
+      &-link {
+        color: @text-primary;
+        font-weight: 700;
+        align-items: center;
+        margin: 0;
+        padding: 0 0.5rem;
+      
+      }
+    }
+
+    &-nav {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-left: auto;
+      height: 100%;
+
+      &-item {
+        flex: 0 0 auto; 
+        position: relative;
+        height: 100%;
+
+        &-link {
+          display: flex;
+          align-items: center;
+          height: 100%;
+          color: @text-primary;
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0 1rem;
+          transition: color 0.3s ease;
+
+          &:hover {
+            color: @accent;
+            background-color: @bg-tertiary;
+          }
+        }
+
+      }
+
+    }
+
+    @media (max-width: @width-phone) {
+      // TODO: адаптив
+    }
+
+  }
+
+}
+
+main {
+  .grid-clock-info {
+    .grid-proportions-adaptive(~"3fr 4fr", 1rem)
+  }
+
+  #clock-canvas {
+    height: 300px;
+    width: 300px;
+    display: flex;
+    margin: 1rem auto;
+    border-radius: 50%;
+    background: transparent;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    cursor: pointer;
+  }
+  #clock-canvas:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px @bg-tertiary
+  }
+}
