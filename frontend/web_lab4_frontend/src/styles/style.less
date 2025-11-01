@@ -1,25 +1,11 @@
-@bg-primary: #121212;
-@bg-secondary: #1e1e1e;
-@bg-tertiary: #2d2d2d;
-@text-primary: #e1e1e1;
-@text-secondary: #888;
-@accent: #6366f1;
-@accent-hover: #4f46e5;
-@success: #10b981;
-@warning: #f59e0b;
-@error: #ef4444;
-
-@cont-max-width: 1200px;
-@cont-gutter: 1rem;
-
-@width-phone: 660px;
-@width-tablet: 1277px;
+@import 'variables.less';
 
 // mixins
 
 .grid-proportions(@cols-values, @gap: 1rem) {
   display: grid;
   grid-template-columns: @cols-values;
+  align-items: center;
   gap: @gap;
   width: 100%;
 
@@ -38,7 +24,6 @@
 }
 
 
-
 // base
 
 *,
@@ -54,6 +39,26 @@
   margin: 0;
   padding: 0;
 }
+
+// begin-костыли чтобы прижать footer
+
+html, body, #app {
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#app > * {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+
+// end-костыли
 
 body {
   background-color: @bg-primary;
@@ -86,6 +91,7 @@ body {
   }
 
   &-body {
+    padding: 1rem 1rem;
     color: @text-secondary;
     font-size: 1rem;
   }
@@ -123,12 +129,156 @@ h3 {
 }
 
 p {
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.5rem 0;
   padding: 0 1rem;
   line-height: 1.6;
   font-size: 1rem;
   color: @text-secondary;
 }
+
+input[type='text'], input[type='number'] {
+  display: flex;
+  border: 1px solid @bg-tertiary;
+  border-radius: 8px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 1rem 1rem;
+  background-color: @bg-secondary;
+  font-size: 1rem;
+  color: @text-primary;
+  transition: box-shadow 0.2s ease-in-out;
+
+  &::-webkit-outer-spin-button, &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &:hover {
+    border-color: @accent;
+  }
+
+  &:focus {
+    border-color: @accent;
+    outline: none;
+    box-shadow: 0px 0px 10px @accent;
+  }
+}
+
+.form-label {
+  margin: 0;
+  padding: 0 0.5rem;
+}
+
+button {
+  display: flex;
+  min-height: 40px;
+  min-width: 100px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid @bg-tertiary;
+  border-radius: 8px;
+  background-color: @bg-secondary;
+  cursor: pointer;
+  color: @text-primary;
+  font-size: 1rem;
+  transition: transform 0.1s ease-in-out;
+
+  &:hover {
+    background-color: @bg-tertiary;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.submit-button {
+    color: @accent;
+    transition: transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  }
+
+  &.submit-button:hover {
+    box-shadow: 0px 0px 10px @accent;
+  }
+
+}
+
+.field-invalid {
+  border-color: @error;
+}
+
+.error-container {
+  .grid-proportions(~"70px 1fr");
+
+  padding: 1rem 1rem;
+  border-radius: 8px;
+  border: 1px solid @error;
+  background-color: @bg-primary;
+  cursor: pointer;
+
+  &-header {
+    color: @error;
+    font-size: 1.25rem;
+    width: 100%;
+  }
+
+  img {
+    width: auto;
+    height: auto;
+    max-height: 70px;
+    justify-self: center;
+  }
+
+  @media(max-width: @width-phone) {
+    display: flex;
+    flex-direction: column;
+
+    img {
+      display: none;
+    }
+  }
+
+}
+
+.points-data > .point-entry:first-child {
+  background-color: @bg-secondary;
+}
+
+div.point-entry {
+  width: 100%;
+  .grid-proportions(~"1fr 1fr 1fr 1fr 2fr 3fr");
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid @bg-tertiary;
+  border-radius: 8px;
+  align-items: center;
+  margin: 0.25rem 0;
+
+  & p {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+span.hit {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  
+  &-true {
+    background-color: @success;
+  }
+
+  &-false {
+    background-color: @error;
+  }
+
+}
+
+
+
 
 header {
   background-color: @bg-secondary;
@@ -138,6 +288,7 @@ header {
   z-index: 1000;
   backdrop-filter: blur(10px);
 
+  // стиль для обозначения текущего роута в навбаре
   .here {
     color: @accent !important;
     border-bottom: 2px solid @accent;
@@ -154,6 +305,10 @@ header {
     &-brand {
       display: flex;
       align-items: center;
+
+      @media (max-width: @width-phone) {
+        display: none;
+      }
 
       &-link {
         color: @text-primary;
@@ -205,8 +360,11 @@ header {
 }
 
 main {
-  .grid-clock-info {
-    .grid-proportions-adaptive(~"3fr 4fr", 1rem)
+  flex: 1;
+
+  .grid-clock-info, .grid-map-form {
+    .grid-proportions-adaptive(~"3fr 4fr", 1rem);
+    margin: 0 0 2rem;
   }
 
   #clock-canvas {
@@ -224,7 +382,57 @@ main {
       box-shadow: 0 8px 25px @bg-tertiary
   }
 
-  .inline-img-text-grid {
-    .grid-proportions(~"50px 1fr", 1rem);
+  .image-text-entry {
+    .grid-proportions(~"clamp(50px, 5vw, 80px) 1fr", 1rem);
+    margin: 0.5rem 0;
+
+    img {
+      width: auto;
+      height: auto;
+      max-height: 70px;
+      justify-self: center;
+      
+    }
+
+    p {
+      text-align: left;
+      margin: 0;
+    }
   }
+
+  #map-canvas {
+    display: flex;
+    margin: 0 auto;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('../assets/img/worldMap.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 300px;
+    height: 300px;
+    border-radius: 8px;
+    border: 1px solid @bg-tertiary;
+    transition: background 0.3s ease;
+  }
+
+  #map-canvas:hover {
+    background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('../assets/img/worldMap.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+  }
+
+}
+
+footer {
+  margin: 2rem 0;
+  border-top: 1px solid @bg-tertiary;
+  padding: 1rem 0;
+  background-color: 'black';
+  
+  p {
+    display: flex;
+    align-items: center;
+  }
+  
 }

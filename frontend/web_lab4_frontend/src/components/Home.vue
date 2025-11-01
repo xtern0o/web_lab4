@@ -2,17 +2,67 @@
     <h1>Главная</h1>
     <div class="grid-clock-info">
         
-        <canvas id="clock-canvas" ref="canvasRef"></canvas>
-                
-        <div class="card">
-            <p class="card-header">Че тут есть</p>
-            <div class="card-body">
-                
-               
-            </div>
+      <Transition appear name="clock-fade">
+        <div>
+          <canvas id="clock-canvas" ref="canvasRef"></canvas>
         </div>
+      </Transition>
+      
+      <Transition appear name="what-fade">
+        <div class="card">
+          <p class="card-header">Че тут есть</p>
+          <div class="card-body">
+            <div class="image-text-entry">
+              <img src="../assets/img/clock.gif" />
+              <p>Смотреть время которое теперь актуально с точностью до секунды</p>
+            </div>
+            <div class="image-text-entry">
+              <img src="../assets/img/cash-register-12248_256.gif" />
+              <p>Смотреть на клевые гифки, которые тут все еще есть (потерпеть). Я старался, искал их, а некоторые даже кропал</p>
+            </div>
+            <div class="image-text-entry">
+              <img src="../assets/img/danger-18465_256.gif" />
+              <p>Ловить ошибки)</p>
+            </div>
+            <div class="image-text-entry">
+              <img src="../assets/img/money-18548_256.gif" />
+              <p>это все еще есть потому что это моя любимая</p>
+            </div>
+          </div>
+        </div>
+      </Transition>        
+      
     </div>
 </template>
+
+<style lang="less" scoped>
+@import '../styles/variables.less';
+
+.what-fade-enter-active, 
+.what-fade-leave-active,
+.clock-fade-enter-active,
+.clock-fade-leave-active {
+  transition: all 0.8s ease;
+}
+
+.what-fade-enter-from,
+.what-fade-leave-to {
+  opacity: 0;
+  @media(min-width: @width-phone) {
+    transform: translateX(50px);
+  }
+  
+}
+
+.clock-fade-enter-from,
+.clock-fade-leave-to {
+  opacity: 0;
+  @media(min-width: @width-phone) {
+    transform: translateX(-50px);
+  }
+  
+}
+</style>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';

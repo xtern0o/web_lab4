@@ -1,8 +1,5 @@
 <script setup>
 
-import Home from './components/Home.vue';
-
-
 </script>
 
 <template>
@@ -16,8 +13,8 @@ import Home from './components/Home.vue';
             <p class="navbar-brand-link">Карнажицкий Максим Романович</p>
             <p class="navbar-brand-link">Лаб 4</p>
             <p class="navbar-brand-link">8281</p>
-          
           </div>
+
           <nav class="navbar-nav">
             <router-link class="navbar-nav-item-link" to="/" exact-active-class="here">Главная</router-link>
             <router-link class="navbar-nav-item-link" to="/points" exact-active-class="here">Точки</router-link>
@@ -35,7 +32,7 @@ import Home from './components/Home.vue';
 
     <footer>
       <div class="container">
-
+        <p>fdsfsdf</p>
       </div>
     </footer>
   </div>
