@@ -136,13 +136,13 @@ p {
   color: @text-secondary;
 }
 
-input[type='text'], input[type='number'] {
+input[type='text'], input[type='number'], input[type='password'] {
   display: flex;
   border: 1px solid @bg-tertiary;
   border-radius: 8px;
   margin: 0 auto;
   width: 100%;
-  padding: 1rem 1rem;
+  padding: 0.5rem 1rem;
   background-color: @bg-secondary;
   font-size: 1rem;
   color: @text-primary;
@@ -164,6 +164,55 @@ input[type='text'], input[type='number'] {
   }
 }
 
+input[type="checkbox"] {
+    appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid @bg-tertiary;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    background: transparent;
+    margin-right: 0.5rem;
+    position: relative;
+
+    + label {
+      vertical-align: middle;
+      cursor: pointer;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    &:hover {
+      transform: scale(1.2);
+      transition: 0.3s ease;
+      border-color: @accent;
+      cursor: pointer;
+    }
+
+    &:checked {
+      background-color: @accent;
+
+      & + label {
+        color: @accent;
+      }
+
+      &::after {
+        content: '\2713'; // Unicode символ галочки (✓)
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: @text-primary; // Цвет галочки
+        font-size: 1rem; // Размер галочки
+        font-weight: bold;
+      }
+
+    }
+}
+
 .form-label {
   margin: 0;
   padding: 0 0.5rem;
@@ -183,6 +232,7 @@ button {
   color: @text-primary;
   font-size: 1rem;
   transition: transform 0.1s ease-in-out;
+  padding: 0.5rem 1rem;
 
   &:hover {
     background-color: @bg-tertiary;
@@ -259,22 +309,6 @@ div.point-entry {
     padding: 0;
     margin: 0;
   }
-}
-
-span.hit {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  
-  &-true {
-    background-color: @success;
-  }
-
-  &-false {
-    background-color: @error;
-  }
-
 }
 
 

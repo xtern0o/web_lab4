@@ -5,7 +5,7 @@
 
       <Transition appear name="map-fade">
       <div>
-        <canvas id="map-canvas" ref="mapCanvas"></canvas>
+        <canvas id="map-canvas" ref="mapCanvas" @click="canvasClick($event)"></canvas>
       </div>
       </Transition>
 
@@ -24,6 +24,7 @@
                     id="x-field" 
                     type="number" 
                     placeholder="Число (-5; 3)"
+                    step="any"
                     required />
                 </div>
                 <div class="grid-form-entry">
@@ -33,6 +34,7 @@
                     id="y-field" 
                     type="number" 
                     placeholder="Число (-5; 3)"
+                    step="any"
                     required />
                 </div>
                 <div class="grid-form-entry">
@@ -41,7 +43,8 @@
                     v-model="r" 
                     id="r-field" 
                     type="number" 
-                    placeholder="Число (-5; 3)"
+                    step="any"
+                    placeholder="Число (0; 3)"
                     required />
                 </div>
               </div>
@@ -61,7 +64,6 @@
                   <p class="error-container-header">{{ currentErrorSummary }}</p>
                   <p>{{ currentErrorMessage }}</p>
                 </div>
-               
               
               </div>
             </Transition>
@@ -81,24 +83,22 @@
             <p>Y</p>
             <p>R</p>
             <p>Пользователь</p>
-            <p>Дата</p>
+            <p>Дата</p> 
           </div>
-          <div class="point-entry">
-            <p>ye</p>
-            <p>3.55455534</p>
-            <p>2.342</p>
-            <p>2.222</p>
-            <p>maxkarn</p>
-            <p>6 jun 2005 23:32</p>
-          </div>
-          <div class="point-entry">
-            <p>ye</p>
-            <p>3.55555434</p>
-            <p>2.35542</p>
-            <p>2.222</p>
-            <p>gfgdfgdfgdfg</p>
-            <p>6 jun 2005 23:32</p>
-          </div>
+
+            <TransitionGroup name="form-fade" tag="div">
+              <div v-for="point in points" class="point-entry" :key="point.id">
+                <p>{{ point.hit }}</p>
+                <p>{{ point.x }}</p>
+                <p>{{ point.y }}</p>
+                <p>{{ point.r }}</p>
+                <p>{{ point.user }}</p>
+                <p>{{ point.date }}</p>
+              </div>
+            </TransitionGroup>
+          
+            <p class="card card-body" v-if="points.length === 0" style="text-align: center;">Точек пока нет. Добавьте их!</p>
+
         </div>
       </div>
     </Transition>
@@ -185,6 +185,8 @@ const currentErrorMessage = ref(null);
 
 const timeoutId = ref(null);
 
+const points = ref([]);
+
 function closeError() {
   showErrorMessage.value = false;
   currentErrorSummary.value = null;
@@ -262,6 +264,8 @@ function clearFields() {
   r.value = null;
 }
 
+var k = 0;
+
 function submitPoint() {
   if (!validateAndShowError()) return;
 
@@ -270,7 +274,24 @@ function submitPoint() {
     "y": y.value,
     "r": r.value
   }
+
+  points.value.unshift(
+    {
+      "id": ++k,
+      "hit": "ye", 
+      "x": pointDto.x,
+      "y": pointDto.y,
+      "r": pointDto.r,
+      "user": "maxkarn",
+      "date": "Nov 2 2025 12:51"
+    }
+  )
+
   console.log(pointDto);
+}
+
+function canvasClick(event) {
+  console.log(event)
 }
 
 </script>

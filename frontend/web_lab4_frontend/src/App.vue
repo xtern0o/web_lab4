@@ -18,6 +18,7 @@
           <nav class="navbar-nav">
             <router-link class="navbar-nav-item-link" to="/" exact-active-class="here">Главная</router-link>
             <router-link class="navbar-nav-item-link" to="/points" exact-active-class="here">Точки</router-link>
+            <router-link class="navbar-nav-item-link" to="/auth" exact-active-class="here">Войти</router-link>
           </nav>
           
         </div>
@@ -32,7 +33,7 @@
 
     <footer>
       <div class="container">
-        <p>fdsfsdf</p>
+        <p>footerfooterfooterfooterfooterfooterfooterfooterfooterfooter</p>
       </div>
     </footer>
   </div>
