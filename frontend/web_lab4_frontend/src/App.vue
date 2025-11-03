@@ -1,5 +1,12 @@
 <script setup>
+import { ref } from 'vue';
 
+
+const navLinks = ref([
+  { name: 'Главная', path: '/' },
+  { name: 'Точки', path: '/points' },
+  { name: 'Войти', path: '/auth' },
+]);
 </script>
 
 <template>
@@ -16,9 +23,15 @@
           </div>
 
           <nav class="navbar-nav">
-            <router-link class="navbar-nav-item-link" to="/" exact-active-class="here">Главная</router-link>
-            <router-link class="navbar-nav-item-link" to="/points" exact-active-class="here">Точки</router-link>
-            <router-link class="navbar-nav-item-link" to="/auth" exact-active-class="here">Войти</router-link>
+            <router-link
+              v-for="link in navLinks"
+              :key="link.path"
+              class="navbar-nav-item-link"
+              :to="link.path"
+              exact-active-class="here"
+            >
+              {{ link.name }}
+            </router-link>
           </nav>
           
         </div>

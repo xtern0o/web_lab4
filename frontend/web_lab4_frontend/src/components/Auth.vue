@@ -15,7 +15,53 @@
 </Transition>
 
 <form @submit.prevent="signup()" v-if="toggleAuth">
-
+    <div class="login-form">
+        <Transition appear name="from-top">
+            <div class="grid-form-entry">
+                <p>Никнейм</p>
+                <input 
+                    v-model="registerUsername"
+                    type="text"
+                    id="register-username-field"
+                    placeholder="От 3 символов..."
+                    required>
+            </div>
+        </Transition>
+        <Transition appear name="from-top">
+            <div class="grid-form-entry">
+                <p>Пароль</p>
+                <input
+                    v-model="registerPassword"
+                    type="password"
+                    id="register-password-field"
+                    placeholder="От 6 символов..."
+                    required>
+            </div>
+        </Transition>   
+        <Transition appear name="from-top">
+            <div>
+                <input
+                    v-model="registerPasswordRepeat"
+                    type="password"
+                    id="register-password-repeat-field"
+                    placeholder="Повторите пароль"
+                    required>
+            </div>
+        </Transition>  
+        <Transition appear name="from-bottom">
+            <div class="remember-grid">
+                <div class="checkbox-container">
+                    <input 
+                        type="checkbox" 
+                        id="register-rememberCheck"
+                        v-model="registerRemember">
+                        <label for="rememberCheck">Запомнить</label>
+                    </input>
+                </div>
+                <button type="submit" class="submit-button" >Зарегистрироваться</button>
+            </div>
+        </Transition>
+    </div>
 </form>
 
 
@@ -70,10 +116,15 @@ const username = ref(null);
 const password = ref(null);
 const remember = ref(false);
 
+const registerUsername = ref(null);
+const registerPassword = ref(null);
+const registerPasswordRepeat = ref(null);
+const registerRemember = ref(false);
+
 const toggleAuth = ref(false);
 
-function validateUsername() {
-    let name = username.value.trim();
+function validateUsername(nam) {
+    let name = nam.trim();
 
     if (!name) {
         return [false, 'Имя пользователя не может быть пустым.'];
@@ -93,9 +144,7 @@ function validateUsername() {
 }
 
 
-function validatePassword() {
-    let pwd = password.value;
-
+function validatePassword(pwd) {
     if (!pwd) {
         return [false, 'Пароль не может быть пустым.'];
     }
@@ -113,13 +162,13 @@ function validatePassword() {
     return [true, "OK"];
 }
 
-function validateAndThrow() {
-    const validateUsername_ret = validateUsername();
+function validateAndThrow(name, pwd) {
+    const validateUsername_ret = validateUsername(name);
     if (!validateUsername_ret[0]) {
         throwError("Невалидный никнейм", validateUsername_ret[1])
         return false;
     }
-    const validatePassword_ret = validatePassword();
+    const validatePassword_ret = validatePassword(pwd);
     if (!validatePassword_ret[0]) {
         throwError("Невалидный пароль", validatePassword_ret[1])
         return false;
@@ -132,13 +181,37 @@ function throwError(summary, message) {
 }
 
 function signin() {
-    if (!validateAndThrow()) return;
+    if (!validateAndThrow(username.value, password.value)) return;
 
     const data = {
         username: username.value,
         password: password.value,
         remember: remember.value
     }
+    console.log("Login");
+    console.log(data);
+}
+
+function signup() {
+    let name = registerUsername.value;
+    let pwd = registerPassword.value;
+    let repeatPwd = registerPasswordRepeat.value;
+    let remember = registerRemember.value;
+
+    if (!(pwd === repeatPwd)) {
+        throwError("Некорректный пароль", "Пароли не совпадают")
+        return;
+    }
+
+    if (!validateAndThrow(name, pwd)) return;
+
+    const data = {
+        username: name,
+        password: pwd,
+        remember: remember
+    }
+
+    console.log("Register: ");
     console.log(data);
 }
 
