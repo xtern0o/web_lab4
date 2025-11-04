@@ -174,7 +174,7 @@
 </style>
 
 <script setup>
-import { inject, onMounted, ref } from 'vue';
+import { inject, onMounted, ref, watch } from 'vue';
 
 // localStorage.setItem("authToken", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYXhrYXJuMiIsImp0aSI6IjgyZGY2MjA3LTg4OTgtNGE4MC1iMDYwLTBiY2RhZTY1OGFhNiIsInVzZXJJZCI6Mywicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTc2MjI1MzE4NiwiZXhwIjoxNzYyMjgxOTg2fQ.0QkMXeWLkQD40DKB2FyuzG-41D_99ISDY5I-Aqt1p3m0dUxCUqs37SREu4ze8i7ALpc3K0O0eD8Q2yp5qRz1lA")
 const isAuth = localStorage.getItem("authToken") !== null || sessionStorage.getItem("authToken") !== null
@@ -191,6 +191,12 @@ const currentErrorMessage = ref(null);
 const timeoutId = ref(null);
 
 const points = ref([]);
+
+watch(r, (oldR, newR) => {
+	if (validateR()[0] || r.value == null || r.value == '') {
+		refreshCanvas()
+	}
+})
 
 const formatDate = (dateString) => {
 	const date = new Date(dateString);
@@ -542,6 +548,41 @@ function refreshCanvasPoints() {
 	})
 }
 
+function refreshCanvas() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	drawCoordinateSystem();
+	drawFigure();
+	refreshCanvasPoints();
+}
+
+function drawFigure() {
+	if (validateR()[0] || r.value == null || r.value == '') {
+		const rValue = r.value;
+
+		ctx.fillStyle = "rgba(0, 48, 73, 0.7)";
+
+		ctx.fillRect(centerX - rValue * one, centerY, rValue * one, rValue * one / 2)
+
+		ctx.beginPath();
+		ctx.moveTo(centerX, centerY);
+		ctx.lineTo(centerX - rValue * one / 2, centerY);
+		ctx.lineTo(centerX, centerY - rValue * one / 2);
+		ctx.closePath();
+		ctx.fill();
+
+		ctx.beginPath();
+		ctx.arc(centerX, centerY, rValue * one / 2, getRadians(0), getRadians(90));
+		ctx.lineTo(centerX, centerY);
+		ctx.closePath();
+		ctx.fill();
+	}
+}
+
+function getRadians(degrees) {
+    return (Math.PI / 180) * degrees;
+}
+
 onMounted(() => {
 	canvas = document.querySelector('#map-canvas');
 	ctx = canvas.getContext('2d')
@@ -549,7 +590,7 @@ onMounted(() => {
 	height = canvas.height;
 	centerX = width / 2;
 	centerY = height / 2;
-	one = 30;
+	one = 50;
 
 	drawCoordinateSystem();
 
