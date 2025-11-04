@@ -5,7 +5,7 @@
 
       <Transition appear name="map-fade">
       <div>
-        <canvas id="map-canvas" ref="mapCanvas" @click="canvasClick($event)"></canvas>
+        <canvas id="map-canvas" ref="mapCanvas" @click="canvasClick($event)" width="300" height="300"></canvas>
       </div>
       </Transition>
 
@@ -62,7 +62,7 @@
                 <img src="../assets/img/danger-18465_256.gif" />
                 <div>
                   <p class="error-container-header">{{ currentErrorSummary }}</p>
-                  <p>{{ currentErrorMessage }}</p>
+                  <p v-html="currentErrorMessage"></p>
                 </div>
               
               </div>
@@ -96,8 +96,9 @@
                 <p>{{ point.date }}</p>
               </div>
             </TransitionGroup>
-          
-            <p class="card card-body" v-if="points.length === 0" style="text-align: center;">Точек пока нет. Добавьте их!</p>
+			
+			<p class="card card-body" v-if="!isAuth" style="text-align: center;">Тут ничего нет, потому что вы не авторизованы!</p>
+            <p class="card card-body" v-else-if="points.length === 0" style="text-align: center;">Точек пока нет. Добавьте их!</p>
 
         </div>
       </div>
@@ -173,7 +174,11 @@
 </style>
 
 <script setup>
-import { ref } from 'vue';
+import { inject, onMounted, ref } from 'vue';
+
+// localStorage.setItem("authToken", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYXhrYXJuMiIsImp0aSI6IjgyZGY2MjA3LTg4OTgtNGE4MC1iMDYwLTBiY2RhZTY1OGFhNiIsInVzZXJJZCI6Mywicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTc2MjI1MzE4NiwiZXhwIjoxNzYyMjgxOTg2fQ.0QkMXeWLkQD40DKB2FyuzG-41D_99ISDY5I-Aqt1p3m0dUxCUqs37SREu4ze8i7ALpc3K0O0eD8Q2yp5qRz1lA")
+const isAuth = localStorage.getItem("authToken") !== null || sessionStorage.getItem("authToken") !== null
+const apiConfig = inject('apiConfig');
 
 const x = ref(null);
 const y = ref(null);
@@ -186,6 +191,26 @@ const currentErrorMessage = ref(null);
 const timeoutId = ref(null);
 
 const points = ref([]);
+
+const formatDate = (dateString) => {
+	const date = new Date(dateString);
+	const day = date.getDate().toString().padStart(2, '0');
+	const month = (date.getMonth() + 1).toString().padStart(2, '0');
+	const year = date.getFullYear();
+	const hours = date.getHours().toString().padStart(2, '0');
+	const minutes = date.getMinutes().toString().padStart(2, '0');
+	
+	return `${day}.${month}.${year} ${hours}:${minutes}`;
+};
+
+// init after mount
+var one = null;
+var centerX = null;
+var centerY = null;
+var canvas = null;
+var ctx = null;
+var width = null;
+var height = null;
 
 function closeError() {
   showErrorMessage.value = false;
@@ -235,63 +260,309 @@ function showError(summary, message) {
 }
 
 function validateAndShowError() {
-  console.log("in valida")
-  const xValid = validateX();
-  if (!xValid[0]) {
-    showError("Ошибка валидации", xValid[1]);
-    return false;
-  }
+	console.log("in valida")
+	const xValid = validateX();
+	if (!xValid[0]) {
+		showError("Ошибка валидации", xValid[1]);
+		return false;
+	}
 
-  const yValid = validateY();
-  if (!yValid[0]) {
-    showError("Ошибка валидации", yValid[1]);
-    return false;
-  }
+	const yValid = validateY();
+	if (!yValid[0]) {
+		showError("Ошибка валидации", yValid[1]);
+		return false;
+	}
 
-  const rValid = validateR();
-  if (!rValid[0]) {
-    showError("Ошибка валидации", rValid[1]);
-    return false;
-  }
-  
-  return true;
+	const rValid = validateR();
+	if (!rValid[0]) {
+		showError("Ошибка валидации", rValid[1]);
+		return false;
+	}
+	
+	return true;
 
 }
 
 function clearFields() {
-  x.value = null;
-  y.value = null;
-  r.value = null;
+	x.value = null;
+	y.value = null;
+	r.value = null;
 }
 
-var k = 0;
+async function submitPoint() {
+	if (!goIfAuth()) return;
 
-function submitPoint() {
-  if (!validateAndShowError()) return;
+	if (!validateAndShowError()) return;
 
-  let pointDto = {
-    "x": x.value,
-    "y": y.value,
-    "r": r.value
-  }
+	let pointDto = {
+		"x": x.value,
+		"y": y.value,
+		"r": r.value
+	}
 
-  points.value.unshift(
-    {
-      "id": ++k,
-      "hit": "ye", 
-      "x": pointDto.x,
-      "y": pointDto.y,
-      "r": pointDto.r,
-      "user": "maxkarn",
-      "date": "Nov 2 2025 12:51"
-    }
-  )
+	try {
+		const response = await fetch(apiConfig.apiUrl + "/points", {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${getAuth().token}`
+			},
+			body: JSON.stringify(pointDto)
+		});
 
-  console.log(pointDto);
+		if (response.ok) {
+			const pointResponse = await response.json();
+
+			points.value.unshift(
+				{
+					"id": pointResponse.id,
+					"hit": pointResponse.hit, 
+					"x": pointDto.x,
+					"y": pointDto.y,
+					"r": pointDto.r,
+					"user": pointResponse.userId,
+					"date": formatDate(pointResponse.createdAt)
+				}
+			)
+
+			const absCoords = systemToAbsCoord(pointDto.x, pointDto.y);
+			drawDot(absCoords.x, absCoords.y, pointResponse.hit)
+
+			console.log(pointResponse)
+		} else {
+			switch (response.status) {
+				case 400:
+					showError("Bad Request", (await response.json()).error)
+					break;
+				case 401:
+					showError("Ошибка авторизации", "Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>")
+					localStorage.clear()
+					sessionStorage.clear()
+					break;
+				
+			}
+		}
+
+		
+	} catch (error) {
+		showError("Ошибка сети", error);
+	}
+	
+}
+
+function drawCoordinateSystem() {
+    const canvas = document.getElementById('map-canvas');
+    const ctx = canvas.getContext('2d');
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    console.log(width, height)
+
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const axisColor = '#333333';
+    const arrowSize = 10;
+
+    ctx.clearRect(0, 0, width, height);
+
+    // оси координат
+    ctx.strokeStyle = axisColor;
+    ctx.lineWidth = 2;
+
+    // ось х
+    ctx.beginPath();
+    ctx.moveTo(0, centerY);
+    ctx.lineTo(width, centerY);
+    ctx.stroke();
+
+    // ось у
+    ctx.beginPath();
+    ctx.moveTo(centerX, 0);
+    ctx.lineTo(centerX, height);
+    ctx.stroke();
+
+    // стрелка х
+    ctx.beginPath();
+    ctx.moveTo(width - arrowSize, centerY - arrowSize/2);
+    ctx.lineTo(width, centerY);
+    ctx.lineTo(width - arrowSize, centerY + arrowSize/2);
+    ctx.stroke();
+
+    // стрелка у
+    ctx.beginPath();
+    ctx.moveTo(centerX - arrowSize/2, arrowSize);
+    ctx.lineTo(centerX, 0);
+    ctx.lineTo(centerX + arrowSize/2, arrowSize);
+    ctx.stroke();
+
+    // и подписать курьером)
+    ctx.fillStyle = axisColor;
+    ctx.font = '14px Courier New';
+    ctx.fillText('x', width - 15, centerY - 10);
+    ctx.fillText('y', centerX + 10, 15);
+    ctx.fillText('0', centerX + 5, centerY - 5);
+}
+
+// рисование точки по абсолютный координатам
+function drawDot(x, y, success) {
+    const color = success ? "#2f9051" : "#ef4444";
+    const strokeColor = "black";
+    const radius = 5;
+
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = strokeColor;
+    ctx.stroke();
+}
+
+// абсолютные координаты в системные
+function absToSystemCoord(x, y) {
+    const logicalX = (x - centerX) / one;
+    const logicalY = (centerY - y) / one;
+
+    return {x: logicalX.toFixed(2), y: logicalY.toFixed(3)};
+}
+
+// системные координаты в абсолютные
+function systemToAbsCoord(x, y) {
+    const absX = x * one + centerX;
+    const absY = centerY - y * one;
+
+    return {x: absX, y: absY};
 }
 
 function canvasClick(event) {
-  console.log(event)
+	if (!goIfAuth()) return;
+
+	const rValid = validateR();
+	if (!rValid[0]) {
+		showError("Ошибка валидации", "Нельзя выбрать точку с некорректным R")
+		return;
+	}
+	const rect = canvas.getBoundingClientRect();
+	const clickX = event.clientX - rect.left;
+	const clickY = event.clientY - rect.top;
+
+	const systemCoords = absToSystemCoord(clickX, clickY);
+
+	if (-5 >= systemCoords.y || 3 <= systemCoords.y) {
+        showError("Неа (Y)", "Y должен быть от -5 до 3 не включительно");
+        return;
+    }
+	if (-5 >= systemCoords.x || 3 <= systemCoords.x) {
+        showError("Неа (X)", "X должен быть от -5 до 3 не включительно");
+        return;
+    }
+
+	x.value = systemCoords.x;
+	y.value = systemCoords.y;
+	submitPoint();
+
 }
 
+function goIfAuth() {
+	if (!isAuth) {
+		showError(
+			"Ошибка авторизации", 
+			"Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>"
+		);
+		return false;
+	}
+	return true;
+}
+
+function getAuth() {
+	if (!isAuth) return null;
+	const authToken = localStorage.getItem("authToken");
+	if (authToken !== null) return {
+		username: localStorage.getItem("authUsername"),
+		token: authToken
+	}
+	const sessionAuthToken = sessionStorage.getItem("authToken");
+
+	if (sessionAuthToken !== null) {
+		return {
+			username: sessionStorage.getItem("authUsername"),
+			token: sessionAuthToken
+		}
+	}
+	return null;
+}
+
+async function getAllPoints() {
+	try {
+		const response = await fetch(
+			apiConfig.apiUrl + "/points", 
+			{
+				method: 'GET',
+				headers: {
+					'Authorization': `Bearer ${getAuth().token}`
+				}
+			}
+		)
+		if (response.ok) {
+			const pointsJson = await response.json()
+			pointsJson.forEach(point => {
+				points.value.unshift(
+					{
+						"id": point.id,
+						"hit": point.hit, 
+						"x": point.x,
+						"y": point.y,
+						"r": point.r,
+						"user": point.userId,
+						"date": formatDate(point.createdAt)
+					}
+				)
+			});
+		} else {
+			throw new Error("Ошибка сети", response.status)
+		}
+	} catch (error) {
+		switch(error.message) {
+			case 400:
+				showError("Bad Request", (await response.json()).error)
+				break;
+			case 401:
+				showError("Ошибка авторизации", "Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>")
+				localStorage.clear()
+				sessionStorage.clear()
+				break;
+		}
+	}
+}
+
+function refreshCanvasPoints() {
+	points.value.forEach(point => {
+		const absCoords = systemToAbsCoord(point.x, point.y);
+		drawDot(absCoords.x, absCoords.y, point.hit)
+	})
+}
+
+onMounted(() => {
+	canvas = document.querySelector('#map-canvas');
+	ctx = canvas.getContext('2d')
+	width = canvas.width;
+	height = canvas.height;
+	centerX = width / 2;
+	centerY = height / 2;
+	one = 30;
+
+	drawCoordinateSystem();
+
+	if (!isAuth) {
+		canvas.style.filter = 'blur(5px)'
+	}
+
+	getAllPoints()
+		.then(() => {
+			refreshCanvasPoints()
+		})
+		.catch(error => {
+			showError("Ошибка получения точек", error)
+		})
+})
 </script>

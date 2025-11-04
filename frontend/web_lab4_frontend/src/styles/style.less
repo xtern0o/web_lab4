@@ -200,13 +200,13 @@ input[type="checkbox"] {
       }
 
       &::after {
-        content: '\2713'; // Unicode символ галочки (✓)
+        content: '\2713'; // unicode ✓
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        color: @text-primary; // Цвет галочки
-        font-size: 1rem; // Размер галочки
+        color: @text-primary;
+        font-size: 1rem;
         font-weight: bold;
       }
 
@@ -379,6 +379,59 @@ header {
             color: @accent;
             background-color: @bg-tertiary;
           }
+        }
+
+        &-user {
+          display: flex;
+          align-items: center;
+          height: 100%;
+          color: @text-primary;
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0 1rem;
+          transition: color 0.3s ease;
+          margin: 0 1rem;
+          position: relative;
+
+          .dropdown-content {
+            padding-top: 1rem;
+            display: none;
+            position: absolute;
+            background-color: transparent;
+            
+            min-width: 160px;
+            z-index: 10;
+            top: 100%;
+            right: 0%;
+            overflow: hidden;
+
+            a {
+              color: @text-primary;
+              padding: 12px 16px;
+              text-decoration: none;
+              display: block;
+              text-align: left;
+              cursor: pointer;
+              opacity: 100%;
+              border: 1px solid @bg-tertiary;
+              border-radius: 4px;
+
+              &:hover {
+                background-color: @bg-tertiary;
+                color: @error;
+              }
+            }
+          }
+
+          &:hover .dropdown-content {
+            display: block;
+          }
+
+          &:hover {
+            border-bottom: 1px solid @error;
+            background-color: @bg-tertiary;
+          }
+          
         }
 
       }

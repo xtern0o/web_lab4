@@ -54,7 +54,7 @@
                     <input 
                         type="checkbox" 
                         id="register-rememberCheck"
-                        v-model="registerRemember">
+                        v-model="remember">
                         <label for="rememberCheck">Запомнить</label>
                     </input>
                 </div>
@@ -105,12 +105,38 @@
     </div>
 </form>
 
+<div class="login-form">
+    <Transition appear name="error-fade">
+        <div v-if="showErrorMessage" class="error-container" @click="closeError()">
+        
+            <img src="../assets/img/danger-18465_256.gif" />
+            <div>
+                <p class="error-container-header">{{ currentErrorSummary }}</p>
+                <p v-html="currentErrorMessage"></p>
+            </div>
+        
+        </div>
+    </Transition>
+</div>
+
+
 
 
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter();
+
+const apiConfig = inject('apiConfig');
+
+const showErrorMessage = ref(false);
+const currentErrorSummary = ref(null);
+const currentErrorMessage = ref(null);
+const timeoutId = ref(null);
+
 
 const username = ref(null);
 const password = ref(null);
@@ -119,9 +145,30 @@ const remember = ref(false);
 const registerUsername = ref(null);
 const registerPassword = ref(null);
 const registerPasswordRepeat = ref(null);
-const registerRemember = ref(false);
 
 const toggleAuth = ref(false);
+
+function closeError() {
+    showErrorMessage.value = false;
+    currentErrorSummary.value = null;
+    currentErrorMessage.message = null;
+
+    if (timeoutId.value) {
+        clearTimeout(timeoutId.value);
+        timeoutId.value = null;
+    }
+}
+
+function showError(summary, message) {
+    if (timeoutId.value) {
+        clearTimeout(timeoutId.value);
+    }
+
+    showErrorMessage.value = true;
+    currentErrorSummary.value = summary;
+    currentErrorMessage.value = message;
+    timeoutId.value = setTimeout(closeError, 5000);
+}
 
 function validateUsername(nam) {
     let name = nam.trim();
@@ -165,22 +212,23 @@ function validatePassword(pwd) {
 function validateAndThrow(name, pwd) {
     const validateUsername_ret = validateUsername(name);
     if (!validateUsername_ret[0]) {
-        throwError("Невалидный никнейм", validateUsername_ret[1])
+        showError("Невалидный никнейм", validateUsername_ret[1])
         return false;
     }
     const validatePassword_ret = validatePassword(pwd);
     if (!validatePassword_ret[0]) {
-        throwError("Невалидный пароль", validatePassword_ret[1])
+        showError("Невалидный пароль", validatePassword_ret[1])
         return false;
     }
     return true;
 }
 
-function throwError(summary, message) {
-    console.log(summary + " " + message)
-}
-
 function signin() {
+    if (localStorage.getItem("authToken") !== null) {
+        showError("Ошибка авторизации", "Вы уже авторизованы")
+        return;
+    }
+
     if (!validateAndThrow(username.value, password.value)) return;
 
     const data = {
@@ -192,27 +240,73 @@ function signin() {
     console.log(data);
 }
 
-function signup() {
+async function signup() {
+    if (localStorage.getItem("authToken") !== null) {
+        showError("Ошибка авторизации", "Вы уже авторизованы")
+        return;
+    }
+
     let name = registerUsername.value;
     let pwd = registerPassword.value;
     let repeatPwd = registerPasswordRepeat.value;
-    let remember = registerRemember.value;
 
     if (!(pwd === repeatPwd)) {
-        throwError("Некорректный пароль", "Пароли не совпадают")
+        showError("Некорректный пароль", "Пароли не совпадают")
         return;
     }
 
     if (!validateAndThrow(name, pwd)) return;
 
     const data = {
-        username: name,
-        password: pwd,
-        remember: remember
+        name: name,
+        password: pwd
     }
 
-    console.log("Register: ");
-    console.log(data);
+    try {
+        const response = await fetch(
+            apiConfig.apiUrl + '/auth/signup',
+            {
+                'method': 'POST',
+                'headers': {
+                    'Content-Type': 'application/json'
+                },
+                'body': JSON.stringify(data)
+            }
+        )
+        
+
+        if (response.ok) {
+            const responseJson = await response.json();
+
+            if (remember.value) {
+                localStorage.setItem("authToken", responseJson.token)
+                localStorage.setItem("authUserName", responseJson.username)
+                localStorage.setItem("authUserId", responseJson.userId)
+            } else {
+                sessionStorage.setItem("authToken", responseJson.token)
+                sessionStorage.setItem("authUserName", responseJson.username)
+                sessionStorage.setItem("authUserId", responseJson.userId)
+            }
+            
+            // TODO: как то обновлять хедер
+            router.push('/points')
+        }
+        else {
+            switch (response.status) {
+                case 409:
+                    showError("409 Conflict", "Пользователь с таким именем уже существует")
+                    break;
+                case 400:
+                    showError("400 Bad Request", "Не нужно посылать плохие запросы")
+                    break;
+                case 302:
+                    showError("302 Found", "Вы УЖЕ авторизованы")
+                    break;
+            }
+        }
+    } catch (error) {
+        showError("Ошибка сети", error)
+    }
 }
 
 
@@ -286,6 +380,17 @@ function signup() {
     transform: translateY(50px);
   }
   
+}
+
+.error-fade-enter-active,
+.error-fade-leave-active {
+  transition: all 0.4s ease;
+}
+
+.error-fade-enter-from,
+.error-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-40px);
 }
 
 </style>

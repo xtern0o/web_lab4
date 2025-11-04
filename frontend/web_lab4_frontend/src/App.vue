@@ -1,16 +1,61 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router'
 
+const router = useRouter();
 
-const navLinks = ref([
-  { name: 'Главная', path: '/' },
-  { name: 'Точки', path: '/points' },
-  { name: 'Войти', path: '/auth' },
-]);
+const authUserName = ref('');
+const isAuth = ref(false);
+
+const getUserName = () => {
+    const localName = localStorage.getItem("authUserName");
+    const sessionName = sessionStorage.getItem("authUserName");
+    return localName || sessionName || '';
+};
+
+const checkAuth = () => {
+    const hasLocalToken = localStorage.getItem("authToken") !== null;
+    const hasSessionToken = sessionStorage.getItem("authToken") !== null;
+    return hasLocalToken || hasSessionToken;
+};
+
+const navigationLinks = computed(() => {
+	const links = [
+		{ name: 'Главная', path: '/' },
+		{ name: 'Точки', path: '/points' },
+	];
+	
+	if (!isAuth.value) {
+		links.push({ name: 'Войти', path: '/auth' });
+	}
+	
+	return links;
+});
+
+onMounted(() => {
+	isAuth.value = checkAuth();
+	authUserName.value = getUserName();
+});
+
+const updateAuthState = () => {
+	isAuth.value = checkAuth();
+	authUserName.value = getUserName();
+};
+
+const logout = () => {
+	localStorage.removeItem("authToken");
+	localStorage.removeItem("authUserName");
+	sessionStorage.removeItem("authToken");
+	sessionStorage.removeItem("authUserName");
+	isAuth.value = false;
+	authUserName.value = '';
+	router.push('/auth');
+};
+
+defineExpose({ updateAuthState });
 </script>
 
 <template>
-
   <div>
     <header>
       <div class="container">
@@ -24,16 +69,21 @@ const navLinks = ref([
 
           <nav class="navbar-nav">
             <router-link
-              v-for="link in navLinks"
+              v-for="link in navigationLinks"
               :key="link.path"
               class="navbar-nav-item-link"
               :to="link.path"
-              exact-active-class="here"
-            >
+              exact-active-class="here">
               {{ link.name }}
             </router-link>
+
+            <div class="navbar-nav-item-user" v-if="isAuth">
+              <a>{{ authUserName }}</a>
+              <div class="dropdown-content">
+                <a @click="logout">Выйти</a>
+              </div>
+            </div>
           </nav>
-          
         </div>
       </div>
     </header>
@@ -50,11 +100,8 @@ const navLinks = ref([
       </div>
     </footer>
   </div>
-
 </template>
 
 <style lang="less">
 @import './styles/style.less';
-
 </style>
-
