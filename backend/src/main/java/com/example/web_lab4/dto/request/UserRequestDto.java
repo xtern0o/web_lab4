@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRequestDto {
-    @NotNull
+    @NotNull(message = "required fields are: {name, password}")
     private String name;
 
-    @NotNull
+    @NotNull(message = "required fields are: {name, password}")
     private String password;
 }

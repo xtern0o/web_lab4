@@ -24,7 +24,6 @@ public class PointController {
             @RequestParam(name = "user_id", required = false) Long userId
     ) {
         if (userId != null) return pointService.getAllPointsByUserId(userId);
-
         return pointService.getAllPoints();
     }
 

@@ -5,6 +5,7 @@ import com.example.web_lab4.dto.response.JwtResponseDto;
 import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.exception.exceptions.AlreadyAuthenticatedException;
 import com.example.web_lab4.security.jwt.JwtUtils;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,7 +29,7 @@ public class AuthService {
         UserEntity userEntity = userService.createUser(userRequestDto);
 
         String jwt = jwtUtils.generateToken(userEntity);
-        return new JwtResponseDto(jwt);
+        return new JwtResponseDto(jwt, userEntity.getId(), userEntity.getUsername());
     }
 
     /**
@@ -46,7 +47,7 @@ public class AuthService {
         }
 
         String jwt = jwtUtils.generateToken(userEntity);
-        return new JwtResponseDto(jwt);
+        return new JwtResponseDto(jwt, userEntity.getId(), userEntity.getUsername());
     }
 
     public boolean isAuthenticated() {
