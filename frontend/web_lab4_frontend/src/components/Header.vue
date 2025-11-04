@@ -1,5 +1,4 @@
 <script setup>
-import Header from './components/Header.vue';
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
 
@@ -57,27 +56,35 @@ defineExpose({ updateAuthState });
 </script>
 
 <template>
-  <div>
-    <header>
-      <div class="container">
-        <Header ref="headerRef" />
-      </div>
-    </header>
-    
-    <main>
-      <div class="container">
-        <router-view />
-      </div>
-    </main>
+<div class="navbar">
+    <div class="navbar-brand">
+        <p class="navbar-brand-link">P3211</p>
+        <p class="navbar-brand-link">Карнажицкий Максим Романович</p>
+        <p class="navbar-brand-link">Лаб 4</p>
+        <p class="navbar-brand-link">8281</p>
+    </div>
 
-    <footer>
-      <div class="container">
-        <p>footerfooterfooterfooterfooterfooterfooterfooterfooterfooter</p>
-      </div>
-    </footer>
-  </div>
+    <nav class="navbar-nav">
+        <router-link
+            v-for="link in navigationLinks"
+            :key="link.path"
+            class="navbar-nav-item-link"
+            :to="link.path"
+            exact-active-class="here">
+            {{ link.name }}
+        </router-link>
+
+        <div class="navbar-nav-item-user" v-if="isAuth">
+            <a>{{ authUserName }}</a>
+            <div class="dropdown-content">
+                <a @click="logout">Выйти</a>
+            </div>
+        </div>
+    </nav>
+</div>
 </template>
 
-<style lang="less">
-@import './styles/style.less';
+<style lang="less" scoped>
+@import '../styles/style.less';
+
 </style>

@@ -223,7 +223,7 @@ function validateAndThrow(name, pwd) {
     return true;
 }
 
-function signin() {
+async function signin() {
     if (localStorage.getItem("authToken") !== null) {
         showError("Ошибка авторизации", "Вы уже авторизованы")
         return;
@@ -231,13 +231,59 @@ function signin() {
 
     if (!validateAndThrow(username.value, password.value)) return;
 
+    let name = username.value;
+    let pwd = password.value;
+
     const data = {
-        username: username.value,
-        password: password.value,
-        remember: remember.value
+        name: name,
+        password: pwd
     }
-    console.log("Login");
-    console.log(data);
+
+    try {
+        const response = await fetch(
+            apiConfig.apiUrl + '/auth/signin',
+            {
+                'method': 'POST',
+                'headers': {
+                    'Content-Type': 'application/json'
+                },
+                'body': JSON.stringify(data)
+            }
+        )
+        
+
+        if (response.ok) {
+            const responseJson = await response.json();
+
+            if (remember.value) {
+                localStorage.setItem("authToken", responseJson.token)
+                localStorage.setItem("authUserName", responseJson.username)
+                localStorage.setItem("authUserId", responseJson.userId)
+            } else {
+                sessionStorage.setItem("authToken", responseJson.token)
+                sessionStorage.setItem("authUserName", responseJson.username)
+                sessionStorage.setItem("authUserId", responseJson.userId)
+            }
+            
+            // TODO: как то обновлять хедер
+            router.push('/points')
+        }
+        else {
+            switch (response.status) {
+                case 404:
+                    showError("404 Not Found", "Пользователя с таким именем не найдено")
+                    break;
+                case 400:
+                    showError("400 Bad Request", "Невалидные данные")
+                    break;
+                case 302:
+                    showError("302 Found", "Вы УЖЕ авторизованы")
+                    break;
+            }
+        }
+    } catch (error) {
+        showError("Ошибка сети", error)
+    }
 }
 
 async function signup() {
