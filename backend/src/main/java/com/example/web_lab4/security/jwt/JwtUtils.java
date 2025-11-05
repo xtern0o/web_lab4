@@ -85,7 +85,6 @@ public class JwtUtils {
 
     public boolean isValidToken(String token) {
         try {
-
             Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()

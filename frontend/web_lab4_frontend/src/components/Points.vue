@@ -194,10 +194,34 @@ const timeoutId = ref(null);
 
 const points = ref([]);
 
-watch(r, (oldR, newR) => {
-	if (validateR()[0] || r.value == null || r.value == '') {
-		refreshCanvas()
-	}
+watch(r, (newR, oldR) => {
+  const newRString = newR?.toString() || '';
+  
+  if (newRString.length > 8) {
+    r.value = oldR;
+    return;
+  }
+  
+  if (validateR()[0] || !r.value) {
+    refreshCanvas()
+  }
+})
+
+watch(x, (newX, oldX) => {
+  const newXString = newX?.toString() || ''
+
+  if (newXString.length > 8) {
+    x.value = oldX;
+  }
+})
+
+
+watch(y, (newY, oldY) => {
+  const newYString = newY?.toString() || ''
+
+  if (newYString.length > 8) {
+    y.value = oldY;
+  }
 })
 
 const formatDate = (dateString) => {

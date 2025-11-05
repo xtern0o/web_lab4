@@ -73,7 +73,7 @@ defineExpose({ updateAuthState });
 
     <footer>
       <div class="container">
-        <p>footerfooterfooterfooterfooterfooterfooterfooterfooterfooter</p>
+        <p>some footer info</p>
       </div>
     </footer>
   </div>

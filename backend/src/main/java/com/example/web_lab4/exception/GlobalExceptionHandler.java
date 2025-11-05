@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JwtExpiredException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Map<String, Object> handleIllegalAccess(JwtExpiredException e) {
-        return defaultErrorHandler("Срок действия JWT-токена истек. Подробнее: " + e.getMessage());
+        return defaultErrorHandler("Срок действия JWT-токена истек. Перезайдите в аккаунт. Подробнее: " + e.getMessage());
     }
 
     @ExceptionHandler(AlreadyAuthenticatedException.class)
