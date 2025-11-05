@@ -25,7 +25,8 @@
                     type="number" 
                     placeholder="Число (-5; 3)"
                     step="any"
-                    required />
+                    required
+					maxlength="8" />
                 </div>
                 <div class="grid-form-entry">
                   <p class="form-label">Введите Y</p>
@@ -35,7 +36,8 @@
                     type="number" 
                     placeholder="Число (-5; 3)"
                     step="any"
-                    required />
+                    required
+					maxlength="8" />
                 </div>
                 <div class="grid-form-entry">
                   <p class="form-label">Введите R</p>
@@ -45,7 +47,8 @@
                     type="number" 
                     step="any"
                     placeholder="Число (0; 3)"
-                    required />
+                    required
+					maxlength="8" />
                 </div>
               </div>
 
@@ -176,7 +179,6 @@
 <script setup>
 import { inject, onMounted, ref, watch } from 'vue';
 
-// localStorage.setItem("authToken", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYXhrYXJuMiIsImp0aSI6IjgyZGY2MjA3LTg4OTgtNGE4MC1iMDYwLTBiY2RhZTY1OGFhNiIsInVzZXJJZCI6Mywicm9sZSI6IlJPTEVfVVNFUiIsImlhdCI6MTc2MjI1MzE4NiwiZXhwIjoxNzYyMjgxOTg2fQ.0QkMXeWLkQD40DKB2FyuzG-41D_99ISDY5I-Aqt1p3m0dUxCUqs37SREu4ze8i7ALpc3K0O0eD8Q2yp5qRz1lA")
 const isAuth = localStorage.getItem("authToken") !== null || sessionStorage.getItem("authToken") !== null
 const apiConfig = inject('apiConfig');
 

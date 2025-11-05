@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, inject } from 'vue';
 import { useRouter } from 'vue-router'
 
 const router = useRouter();
+const apiConfig = inject('apiConfig');
 
 const authUserName = ref('');
 const isAuth = ref(false);
@@ -42,7 +43,7 @@ const updateAuthState = () => {
 	authUserName.value = getUserName();
 };
 
-const logout = () => {
+async function logout() {
 	localStorage.removeItem("authToken");
 	localStorage.removeItem("authUserName");
 	sessionStorage.removeItem("authToken");
@@ -50,6 +51,19 @@ const logout = () => {
 	isAuth.value = false;
 	authUserName.value = '';
 	router.push('/auth');
+
+    try {
+        const response = await fetch(apiConfig.apiUrl + "/auth/logout", {
+            method: 'GET',
+        });
+        if (response.ok) {
+            console.log('ТОКЕН В БЛЕКЛИСТЕ УРА')
+        }
+    } catch (error) {
+        console.log('Connection Error')
+    }
+    
+
 };
 
 defineExpose({ updateAuthState });

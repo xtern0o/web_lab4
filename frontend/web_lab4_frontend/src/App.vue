@@ -50,6 +50,7 @@ const logout = () => {
 	sessionStorage.removeItem("authUserName");
 	isAuth.value = false;
 	authUserName.value = '';
+
 	router.push('/auth');
 };
 
