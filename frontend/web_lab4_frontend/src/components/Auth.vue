@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-import { inject, ref } from 'vue'
+import { inject, onBeforeMount, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 
@@ -147,6 +147,19 @@ const registerPassword = ref(null);
 const registerPasswordRepeat = ref(null);
 
 const toggleAuth = ref(false);
+
+
+
+onBeforeMount(() => {
+    const checkAuth = () => {
+        const hasLocalToken = localStorage.getItem("authToken") !== null;
+        const hasSessionToken = sessionStorage.getItem("authToken") !== null;
+        return hasLocalToken || hasSessionToken;
+    };
+    if (checkAuth()) {
+        router.push("/points")
+    }
+})
 
 function closeError() {
     showErrorMessage.value = false;
@@ -265,8 +278,7 @@ async function signin() {
                 sessionStorage.setItem("authUserId", responseJson.userId)
             }
             
-            // TODO: как то обновлять хедер
-            router.push('/points')
+            location.reload();
         }
         else {
             switch (response.status) {
@@ -334,8 +346,7 @@ async function signup() {
                 sessionStorage.setItem("authUserId", responseJson.userId)
             }
             
-            // TODO: как то обновлять хедер
-            router.push('/points')
+            location.reload();
         }
         else {
             switch (response.status) {
