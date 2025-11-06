@@ -38,7 +38,7 @@ onMounted(() => {
 	authUserName.value = getUserName();
 });
 
-const updateAuthState = () => {
+function updateAuthState() {
 	isAuth.value = checkAuth();
 	authUserName.value = getUserName();
 };

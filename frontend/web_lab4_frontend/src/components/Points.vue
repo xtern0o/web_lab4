@@ -91,7 +91,7 @@
 
             <TransitionGroup name="form-fade" tag="div">
               <div v-for="point in points" class="point-entry" :key="point.id">
-                <p>{{ point.hit }}</p>
+                <p>{{ point.hit ? "Попал" : "Промазал" }}</p>
                 <p>{{ point.x }}</p>
                 <p>{{ point.y }}</p>
                 <p>{{ point.r }}</p>
