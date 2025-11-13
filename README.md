@@ -12,7 +12,9 @@ cd web_lab4
 
 2) сбилдить проект
 ```bash
-./gradlew build 
+cd backend
+./gradlew build
+cd .. 
 ```
 
 3) в корне проекта создайте файл `.env` и заполните его нужными данными по подобию `.env.example`
@@ -24,7 +26,7 @@ JWT_SECRET      - секрет для jwt (делайте очень длинн�
 REDIS_PASSWORD  - пароль от редис базы
 ```
 
-4) в `frontend/web_lab4_frontend` создайте `.env.production` как `.env.example` ток значениями своими заполнить надо (`VITE_API_URL` ставь `http://localhost/api` потому что в nginx прокси настроен, а таймаут без разницы там в целом)
+4) в `frontend/web_lab4_frontend` создайте `.env.production` как `.env.example` ток значениями своими заполнить надо (`VITE_API_URL` ставь `/api` потому что в nginx прокси настроен, а таймаут без разницы там в целом)
 
 5) докер компос!!
 
