@@ -6,6 +6,7 @@ const router = useRouter();
 const apiConfig = inject('apiConfig');
 
 const authUserName = ref('');
+const authUserId = ref('')
 const isAuth = ref(false);
 
 const getUserName = () => {
@@ -13,6 +14,12 @@ const getUserName = () => {
     const sessionName = sessionStorage.getItem("authUserName");
     return localName || sessionName || '';
 };
+
+const getUserId = () => {
+    const localName = localStorage.getItem("authUserId");
+    const sessionName = sessionStorage.getItem("authUserId");
+    return localName || sessionName || '';
+}
 
 const checkAuth = () => {
     const hasLocalToken = localStorage.getItem("authToken") !== null;
@@ -36,18 +43,22 @@ const navigationLinks = computed(() => {
 onMounted(() => {
 	isAuth.value = checkAuth();
 	authUserName.value = getUserName();
+    authUserId.value = getUserId();
 });
 
 function updateAuthState() {
 	isAuth.value = checkAuth();
 	authUserName.value = getUserName();
+    authUserId.value = getUserId();
 };
 
 async function logout() {
 	localStorage.removeItem("authToken");
 	localStorage.removeItem("authUserName");
+    localStorage.removeItem("authUserId");
 	sessionStorage.removeItem("authToken");
 	sessionStorage.removeItem("authUserName");
+    sessionStorage.removeItem("authUserId");
 	isAuth.value = false;
 	authUserName.value = '';
 	router.push('/auth');
@@ -89,7 +100,7 @@ defineExpose({ updateAuthState });
         </router-link>
 
         <div class="navbar-nav-item-user" v-if="isAuth">
-            <a>{{ authUserName }}</a>
+            <a>{{ authUserName }} ({{ authUserId }})</a>
             <div class="dropdown-content">
                 <a @click="logout">Выйти</a>
             </div>

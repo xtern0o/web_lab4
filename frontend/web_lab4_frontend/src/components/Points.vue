@@ -79,6 +79,10 @@
 
     <Transition appear name="data-fade">
       <div class="card card-body">
+        <!-- <button id="viewMode" @click="showMine = !showMine">
+          <template v-if="showMine">Отображать все</template>
+          <template v-else>Отображать только мои</template>
+        </button> -->
         <div class="points-data">
           <div class="point-entry">
             <p>Hit?</p>
@@ -100,9 +104,8 @@
               </div>
             </TransitionGroup>
 			
-			<p class="card card-body" v-if="!isAuth" style="text-align: center;">Тут ничего нет, потому что вы не авторизованы!</p>
+			      <p class="card card-body" v-if="!isAuth" style="text-align: center;">Тут ничего нет, потому что вы не авторизованы!</p>
             <p class="card card-body" v-else-if="points.length === 0" style="text-align: center;">Точек пока нет. Добавьте их!</p>
-
         </div>
       </div>
     </Transition>
@@ -193,6 +196,8 @@ const currentErrorMessage = ref(null);
 const timeoutId = ref(null);
 
 const points = ref([]);
+
+const showMine = ref(false);
 
 watch(r, (newR, oldR) => {
   const newRString = newR?.toString() || '';
