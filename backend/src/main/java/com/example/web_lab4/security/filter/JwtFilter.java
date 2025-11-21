@@ -56,8 +56,6 @@ public class JwtFilter extends OncePerRequestFilter {
             throw new JwtExpiredException(expiredJwtException.getMessage(), expiredJwtException);
         }
 
-
-
         filterChain.doFilter(request, response);
     }
 }

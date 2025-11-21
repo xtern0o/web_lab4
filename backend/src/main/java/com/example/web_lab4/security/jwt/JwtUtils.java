@@ -37,7 +37,6 @@ public class JwtUtils {
                 .subject(userEntity.getUsername())
                 .id(jti)
                 .add("userId", userEntity.getId())
-                .add("role", userEntity.getRole().name())
                 .build();
 
         Date now = new Date();

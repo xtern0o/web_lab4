@@ -6,7 +6,10 @@ plugins {
 
 group = 'com.example'
 version = '1.0'
-description = 'lab 4 web prog :D'
+description = 'lab 4 web prog'
+
+// скипаем тест потому что не настроена тестовая бд
+project.gradle.startParameter.excludedTaskNames.add("test");
 
 java {
 	toolchain {

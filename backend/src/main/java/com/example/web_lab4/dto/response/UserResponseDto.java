@@ -17,5 +17,5 @@ public class UserResponseDto {
     private String name;
 
     @NotNull
-    private Role role;
+    private String roleName;
 }
