@@ -43,6 +43,25 @@ services:
     depends_on:
       - backend
 
+  keycloak:
+    container_name: Keycloak
+    image: quay.io/keycloak/keycloak:latest
+    ports:
+      - "9090:9090"
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+    depends_on:
+      - postgres
+    command:
+      "start-dev"
+
 volumes:
   postgres_data:
   redis_data:
+  keycloak:
