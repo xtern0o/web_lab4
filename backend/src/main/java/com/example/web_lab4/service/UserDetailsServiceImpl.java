@@ -1,6 +1,5 @@
 package com.example.web_lab4.service;
 
-import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

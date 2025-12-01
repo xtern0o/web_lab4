@@ -3,7 +3,6 @@ package com.example.web_lab4.security.filter;
 import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.exception.exceptions.JwtExpiredException;
 import com.example.web_lab4.security.jwt.JwtUtils;
-import com.example.web_lab4.service.TokenBlackListService;
 import com.example.web_lab4.service.UserDetailsServiceImpl;
 import com.example.web_lab4.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -27,7 +26,6 @@ import java.io.IOException;
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final UserDetailsServiceImpl userDetailsService;
-    private final TokenBlackListService tokenBlackListService;
 
     @Override
     protected void doFilterInternal(
@@ -41,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-            if (tokenBlackListService.isBlacklisted(token) || !jwtUtils.isValidToken(token)) {
+            if (!jwtUtils.isValidToken(token)) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -55,8 +53,6 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException expiredJwtException) {
             throw new JwtExpiredException(expiredJwtException.getMessage(), expiredJwtException);
         }
-
-
 
         filterChain.doFilter(request, response);
     }

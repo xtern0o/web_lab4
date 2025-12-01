@@ -1,7 +1,6 @@
 package com.example.web_lab4.security.jwt;
 
 import com.example.web_lab4.entity.UserEntity;
-import com.example.web_lab4.service.TokenBlackListService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -37,7 +36,6 @@ public class JwtUtils {
                 .subject(userEntity.getUsername())
                 .id(jti)
                 .add("userId", userEntity.getId())
-                .add("role", userEntity.getRole().name())
                 .build();
 
         Date now = new Date();
@@ -99,7 +97,9 @@ public class JwtUtils {
      * Уникальный JTI для того чтобы не хранить целиком токены в блеклисте
      * @param token токен
      * @return JTI
+     * @deprecated
      */
+    @Deprecated
     public String getJti(String token) {
         return getClaim(token, Claims::getId);
     }

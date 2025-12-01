@@ -2,7 +2,6 @@ package com.example.web_lab4.security.config;
 
 import com.example.web_lab4.security.filter.JwtFilter;
 import com.example.web_lab4.security.handler.AccessDeniedHandlerImpl;
-import com.example.web_lab4.security.handler.LogoutHandlerImpl;
 import com.example.web_lab4.service.UserDetailsServiceImpl;
 import com.example.web_lab4.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final AccessDeniedHandlerImpl accessDeniedHandler;
-    private final LogoutHandlerImpl logoutHandler;
     private final JwtFilter jwtFilter;
 
     @Bean
@@ -82,7 +80,6 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(log -> log
                         .logoutUrl("/auth/logout")
-                        .addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()))
                 );
 

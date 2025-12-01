@@ -14,7 +14,7 @@ public class UserMapper {
         UserEntity userEntity = new UserEntity();
         userEntity.setName(userRequestDTO.getName());
         userEntity.setPassword(userRequestDTO.getPassword());
-        userEntity.setRole(Role.ROLE_USER);
+        userEntity.setRole(null);
         return userEntity;
     }
 
@@ -22,7 +22,7 @@ public class UserMapper {
         return new UserResponseDto(
                 userEntity.getId(),
                 userEntity.getName(),
-                userEntity.getRole()
+                userEntity.getRole().getName()
         );
     }
 

@@ -79,10 +79,10 @@
 
     <Transition appear name="data-fade">
       <div class="card card-body">
-        <!-- <button id="viewMode" @click="showMine = !showMine">
+        <button v-if="isAuth" id="viewMode" @click="showMine = !showMine">
           <template v-if="showMine">Отображать все</template>
           <template v-else>Отображать только мои</template>
-        </button> -->
+        </button>
         <div class="points-data">
           <div class="point-entry">
             <p>Hit?</p>
@@ -573,10 +573,19 @@ async function getAllPoints() {
 }
 
 function refreshCanvasPoints() {
-	points.value.forEach(point => {
-		const absCoords = systemToAbsCoord(point.x, point.y);
-		drawDot(absCoords.x, absCoords.y, point.hit)
-	})
+  if (!showMine) {
+    points.value.forEach(point => {
+        const absCoords = systemToAbsCoord(point.x, point.y);
+        drawDot(absCoords.x, absCoords.y, point.hit)
+    })
+  } else {
+    currUserId = localStorage.getItem("authUserId")
+    points.value.filter(point => point.user == currUserId).forEach(point => {
+        const absCoords = systemToAbsCoord(point.x, point.y);
+        drawDot(absCoords.x, absCoords.y, point.hit)
+    })
+  }
+	
 }
 
 function refreshCanvas() {

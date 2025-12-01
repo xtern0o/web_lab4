@@ -1,6 +1,7 @@
 package com.example.web_lab4.service;
 
 import com.example.web_lab4.dto.request.UserRequestDto;
+import com.example.web_lab4.entity.RoleEntity;
 import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.mapping.UserMapper;
 import com.example.web_lab4.repository.UserRepository;
@@ -34,5 +35,10 @@ public class UserService {
                         String.format("Пользователь с именем '%s' не найден", username)
                 )
         );
+    }
+
+    public RoleEntity getRoleForUser(String username) {
+        UserEntity user = getByUsername(username);
+        return user.getRole();
     }
 }
