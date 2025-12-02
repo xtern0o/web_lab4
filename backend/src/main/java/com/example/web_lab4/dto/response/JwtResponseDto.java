@@ -5,14 +5,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class JwtResponseDto {
     @NotNull
     private String token;
+
     @NotNull
-    private Long userId;
+    private UUID userId;
+
     @NotNull
     private String username;
 }

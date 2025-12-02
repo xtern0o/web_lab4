@@ -1,16 +1,12 @@
 package com.example.web_lab4.security.config;
 
-import com.example.web_lab4.security.filter.JwtFilter;
+import com.example.web_lab4.security.jwt.JwtFilter;
 import com.example.web_lab4.security.handler.AccessDeniedHandlerImpl;
-import com.example.web_lab4.service.UserDetailsServiceImpl;
-import com.example.web_lab4.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;

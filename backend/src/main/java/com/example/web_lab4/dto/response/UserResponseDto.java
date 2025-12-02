@@ -6,12 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponseDto {
     @NotNull
-    private Long id;
+    private UUID id;
 
     @NotNull
     private String name;

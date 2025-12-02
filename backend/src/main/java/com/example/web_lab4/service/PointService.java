@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,7 @@ public class PointService {
         return pointMapper.toListOfResponseDTO(pointRepository.findAll());
     }
 
-    public List<PointResponseDto> getAllPointsByUserId(Long id) {
+    public List<PointResponseDto> getAllPointsByUserId(UUID id) {
         return pointMapper.toListOfResponseDTO(pointRepository.findAllByUserId(id));
     }
 

@@ -1,10 +1,7 @@
-package com.example.web_lab4.security.filter;
+package com.example.web_lab4.security.jwt;
 
-import com.example.web_lab4.entity.UserEntity;
 import com.example.web_lab4.exception.exceptions.JwtExpiredException;
-import com.example.web_lab4.security.jwt.JwtUtils;
 import com.example.web_lab4.service.UserDetailsServiceImpl;
-import com.example.web_lab4.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

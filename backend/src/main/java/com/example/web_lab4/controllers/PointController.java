@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/points")
@@ -21,7 +22,7 @@ public class PointController {
 
     @GetMapping
     public List<PointResponseDto> getPoints(
-            @RequestParam(name = "user_id", required = false) Long userId
+            @RequestParam(name = "user_id", required = false) UUID userId
     ) {
         if (userId != null) return pointService.getAllPointsByUserId(userId);
         return pointService.getAllPoints();

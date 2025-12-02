@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -25,7 +26,7 @@ public class PointResponseDto {
     private boolean hit;
 
     @NotNull
-    private Long userId;
+    private UUID userId;
 
     @NotNull
     private Instant createdAt;
