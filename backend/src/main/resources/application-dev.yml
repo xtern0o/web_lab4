@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: web_lab4
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/web_lab4_db
+    username: maxkarn
+    password: maxkarn
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+app:
+  jwt:
+    secret: "666JNFKDHFKLDK:jkjf;ldsjfosdijfu943hpfihuifhdsihfdjghoi;dfhg87fhu;gfyhgisfhgudshfuGUPHFuhdfhiphfsdhfdjfh;kdshfsd"
+    token_expiration: 28800000
+    refresh_token_expiration: 252000000
