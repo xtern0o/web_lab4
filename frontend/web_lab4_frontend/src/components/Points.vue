@@ -79,10 +79,6 @@
 
     <Transition appear name="data-fade">
       <div class="card card-body">
-        <button v-if="isAuth" id="viewMode" @click="showMine = !showMine">
-          <template v-if="showMine">Отображать все</template>
-          <template v-else>Отображать только мои</template>
-        </button>
         <div class="points-data">
           <div class="point-entry">
             <p>Hit?</p>
@@ -197,7 +193,6 @@ const timeoutId = ref(null);
 
 const points = ref([]);
 
-const showMine = ref(false);
 
 watch(r, (newR, oldR) => {
   const newRString = newR?.toString() || '';
@@ -573,20 +568,13 @@ async function getAllPoints() {
 }
 
 function refreshCanvasPoints() {
-  if (!showMine) {
-    points.value.forEach(point => {
-        const absCoords = systemToAbsCoord(point.x, point.y);
-        drawDot(absCoords.x, absCoords.y, point.hit)
-    })
-  } else {
-    currUserId = localStorage.getItem("authUserId")
-    points.value.filter(point => point.user == currUserId).forEach(point => {
-        const absCoords = systemToAbsCoord(point.x, point.y);
-        drawDot(absCoords.x, absCoords.y, point.hit)
-    })
-  }
-	
+  points.value.forEach(point => {
+      const absCoords = systemToAbsCoord(point.x, point.y);
+      drawDot(absCoords.x, absCoords.y, point.hit)
+  })
 }
+	
+
 
 function refreshCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
