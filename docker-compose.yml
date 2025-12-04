@@ -51,7 +51,7 @@ services:
     depends_on:
       - postgres
     command:
-      "start-dev --http-port=9090"
+      "start-dev --http-port=9090 --hostname-strict=false --http-enabled=true"
 
 volumes:
   postgres_data:
