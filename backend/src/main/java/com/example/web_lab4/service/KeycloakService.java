@@ -4,9 +4,12 @@ import com.example.web_lab4.config.KeycloakProperties;
 import com.example.web_lab4.dto.request.AuthCodeRequestDto;
 import com.example.web_lab4.dto.response.KeycloakTokenResponseDto;
 import com.example.web_lab4.dto.response.TokenResponseDto;
+import com.example.web_lab4.exception.exceptions.KeycloakTokenException;
 import com.example.web_lab4.mapping.TokenResponseMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,6 +24,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KeycloakService {
     private final KeycloakProperties keycloakProperties;
     private final WebClient.Builder webClientBuilder;
@@ -56,7 +60,8 @@ public class KeycloakService {
             return tokenResponseMapper.fromKeycloakTokenResponseToTokenResponse(keycloakTokenResponseDto);
 
         } catch (WebClientResponseException e) {
-            throw new RuntimeException("Ошибка получения токенов из KC");
+            throw new KeycloakTokenException(e.getStatusCode(), e.getResponseBodyAsString());
+
         }
 
     }
@@ -93,7 +98,7 @@ public class KeycloakService {
             return tokenResponseMapper.fromKeycloakTokenResponseToTokenResponse(keycloakTokenResponseDto);
             
         } catch (WebClientResponseException e) {
-            throw new RuntimeException("Ошибка обновления токена");
+            throw new KeycloakTokenException(e.getStatusCode(), e.getResponseBodyAsString());
         }
     }
 

@@ -2,7 +2,7 @@ keycloak:
   realm: "web-lab4"
   auth-server-url: "http://localhost:9090"
   client-id: "web-lab4-client"
-  client-secret: ${KEYCLOAK_CLIENT_SECRET}
+  client-secret: "mYjGCt2kwZYRuaeBqr0pVBbI1LtsXF70"
   token-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/token
 
 spring:
