@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthCodeRequestFromClientDto {
+public class AuthCodeRequestDto {
     @NotBlank(message = "Auth Code is required")
     private String code;
 

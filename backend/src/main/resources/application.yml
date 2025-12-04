@@ -30,8 +30,5 @@ spring:
         jwt:
           issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}
 
-app:
-  jwt:
-    secret: ${JWT_SECRET}
-    token_expiration: 28800000
-    refresh_token_expiration: 252000000
+#frontend:
+#  url: ${FRONTEND_URL}

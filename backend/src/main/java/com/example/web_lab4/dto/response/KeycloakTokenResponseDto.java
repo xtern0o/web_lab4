@@ -7,13 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * токены, которые получает клиент при успешной проверке Authorization Code
+ * То, что мы получаем от КК при передаче Authorization Code
  */
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenResponseDto {
+public class KeycloakTokenResponseDto {
+
     @JsonProperty("access_token")
     private String accessToken;
 
@@ -32,4 +32,12 @@ public class TokenResponseDto {
     @JsonProperty("id_token")
     private String idToken;
 
+    @JsonProperty("scope")
+    private String scope;
+
+    @JsonProperty("not-before-policy")
+    private Integer notBeforePolicy;
+
+    @JsonProperty("session_state")
+    private String sessionState;
 }
