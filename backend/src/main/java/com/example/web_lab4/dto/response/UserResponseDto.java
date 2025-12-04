@@ -1,6 +1,5 @@
 package com.example.web_lab4.dto.response;
 
-import com.example.web_lab4.entity.enums.Role;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,7 +16,4 @@ public class UserResponseDto {
 
     @NotNull
     private String name;
-
-    @NotNull
-    private String roleName;
 }

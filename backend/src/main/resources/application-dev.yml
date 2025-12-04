@@ -17,6 +17,12 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://localhost:9090/realms/web-lab4"
+
 app:
   jwt:
     secret: "666JNFKDHFKLDK:jkjf;ldsjfosdijfu943hpfihuifhdsihfdjghoi;dfhg87fhu;gfyhgisfhgudshfuGUPHFuhdfhiphfsdhfdjfh;kdshfsd"

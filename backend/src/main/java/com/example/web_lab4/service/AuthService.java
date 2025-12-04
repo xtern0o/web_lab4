@@ -1,58 +1,51 @@
 package com.example.web_lab4.service;
 
-import com.example.web_lab4.dto.request.UserRequestDto;
-import com.example.web_lab4.dto.response.JwtResponseDto;
 import com.example.web_lab4.entity.UserEntity;
-import com.example.web_lab4.exception.exceptions.AlreadyAuthenticatedException;
-import com.example.web_lab4.security.jwt.JwtUtils;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final UserService userService;
-    private final JwtUtils jwtUtils;
-    private final PasswordEncoder passwordEncoder;
-
     /**
-     * Регистрация пользователя и генерация jwt-токена для него
-     * @param userRequestDto DTO пользователя
-     * @return JWT-токен
+     * Получаем JWT текущего пользователя
+     * @return jwt объект
      */
-    public JwtResponseDto signUp(UserRequestDto userRequestDto) {
-        UserEntity userEntity = userService.createUser(userRequestDto);
+    public Jwt getCurrentJwt() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String jwt = jwtUtils.generateToken(userEntity);
-        return new JwtResponseDto(jwt, userEntity.getId(), userEntity.getUsername());
-    }
-
-    /**
-     * Аутентификация пользователя
-     * @param userRequestDto DTO пользователя
-     * @return JWT-токен
-     */
-    public JwtResponseDto signIn(UserRequestDto userRequestDto) {
-        if (isAuthenticated()) throw new AlreadyAuthenticatedException(userService.getByUsername(userRequestDto.getName()));
-
-        UserEntity userEntity = userService.getByUsername(userRequestDto.getName());
-
-        if (!passwordEncoder.matches(userRequestDto.getPassword(), userEntity.getPassword())) {
-            throw new BadCredentialsException("Неверный пароль");
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("Пользователь не авторизован");
         }
 
-        String jwt = jwtUtils.generateToken(userEntity);
-        return new JwtResponseDto(jwt, userEntity.getId(), userEntity.getUsername());
+        if (!(authentication.getPrincipal() instanceof Jwt)) {
+            throw new RuntimeException("Auth Principal не jwt");
+        }
+
+        return (Jwt) authentication.getPrincipal();
     }
 
-    public boolean isAuthenticated() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
+    /**
+     * Проверка, имеет ли текущий пользователь ту или иную роль
+     * @param role роль БЕЗ префикса ROLE_
+     * @return есть ли роль
+     */
+    public boolean hasRole(String role) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        return authorities.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_" + role.toUpperCase()));
     }
+
 
 }

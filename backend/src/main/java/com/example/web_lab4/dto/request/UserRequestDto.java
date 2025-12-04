@@ -12,6 +12,4 @@ public class UserRequestDto {
     @NotNull(message = "required fields are: {name, password}")
     private String name;
 
-    @NotNull(message = "required fields are: {name, password}")
-    private String password;
 }
