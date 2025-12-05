@@ -1,6 +1,7 @@
 package com.example.web_lab4.controllers;
 
 import com.example.web_lab4.dto.request.AuthCodeRequestDto;
+import com.example.web_lab4.dto.request.RefreshRequestDto;
 import com.example.web_lab4.dto.response.TokenResponseDto;
 import com.example.web_lab4.service.KeycloakService;
 import jakarta.validation.Valid;
@@ -26,5 +27,12 @@ public class AuthController {
             @Valid @RequestBody AuthCodeRequestDto authCodeRequestDto
     ) {
         return keycloakService.exchangeCodeForTokens(authCodeRequestDto);
+    }
+
+    @PostMapping("/refresh")
+    public TokenResponseDto refreshToken(
+            @Valid @RequestBody RefreshRequestDto refreshRequestDto
+    ) {
+        return keycloakService.refreshAccessToken(refreshRequestDto.getRefreshToken());
     }
 }
