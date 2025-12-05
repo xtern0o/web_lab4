@@ -254,6 +254,41 @@ button {
 
 }
 
+a.button {
+  display: flex;
+  min-height: 40px;
+  min-width: 100px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid @bg-tertiary;
+  border-radius: 8px;
+  background-color: @bg-secondary;
+  cursor: pointer;
+  color: @text-primary;
+  font-size: 1rem;
+  transition: transform 0.1s ease-in-out;
+  padding: 0.5rem 1rem;
+
+  &:hover {
+    background-color: @bg-tertiary;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &.submit-button {
+    color: @accent;
+    transition: transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  }
+
+  &.submit-button:hover {
+    box-shadow: 0px 0px 10px @accent;
+  }
+}
+
 .field-invalid {
   border-color: @error;
 }

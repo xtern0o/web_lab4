@@ -31,6 +31,8 @@ services:
 
   frontend:
     build: ./frontend/web_lab4_frontend
+    environment:
+      VITE_AUTH_SERVER_URL: ${KEYCLOAK_SERVER_URL}
     ports:
       - "${PORT_FRONTEND}:80"
     depends_on:

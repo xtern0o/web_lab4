@@ -1,120 +1,24 @@
 <template>
 
-<h1>
-    <template v-if="toggleAuth">Регистрация</template>
-    <template v-else>Авторизация</template>
-</h1>
+<h1>Авторизация</h1>
 
-<Transition appear name="from-top">
+
 <div class="login-form">
-    <button type="button" @click="toggleAuth = !toggleAuth">
-        <template v-if="toggleAuth">Есть аккаунт?</template>
-        <template v-else>Нет аккаунта?</template>
-    </button>
+    <Transition appear name="from-bottom">
+        <a type="submit" class="button submit-button" :href="keycloakAuthUri">Войти с помощью Keycloak</a>
+    </Transition>
+    
 </div>
-</Transition>
 
-<form @submit.prevent="signup()" v-if="toggleAuth">
-    <div class="login-form">
-        <Transition appear name="from-top">
-            <div class="grid-form-entry">
-                <p>Никнейм</p>
-                <input 
-                    v-model="registerUsername"
-                    type="text"
-                    id="register-username-field"
-                    placeholder="От 3 символов..."
-                    required>
-            </div>
-        </Transition>
-        <Transition appear name="from-top">
-            <div class="grid-form-entry">
-                <p>Пароль</p>
-                <input
-                    v-model="registerPassword"
-                    type="password"
-                    id="register-password-field"
-                    placeholder="От 6 символов..."
-                    required>
-            </div>
-        </Transition>   
-        <Transition appear name="from-top">
-            <div>
-                <input
-                    v-model="registerPasswordRepeat"
-                    type="password"
-                    id="register-password-repeat-field"
-                    placeholder="Повторите пароль"
-                    required>
-            </div>
-        </Transition>  
-        <Transition appear name="from-bottom">
-            <div class="remember-grid">
-                <div class="checkbox-container">
-                    <input 
-                        type="checkbox" 
-                        id="register-rememberCheck"
-                        v-model="remember">
-                        <label for="rememberCheck">Запомнить</label>
-                    </input>
-                </div>
-                <button type="submit" class="submit-button" >Зарегистрироваться</button>
-            </div>
-        </Transition>
-    </div>
-</form>
-
-
-<form @submit.prevent="signin()" v-else>
-    <div class="login-form">
-        <Transition appear name="from-top">
-            <div class="grid-form-entry">
-                <p>Никнейм</p>
-                <input 
-                    v-model="username"
-                    type="text"
-                    id="login-username-field"
-                    placeholder="От 3 символов..."
-                    required>
-            </div>
-        </Transition>
-        <Transition appear name="from-top">
-            <div class="grid-form-entry">
-                <p>Пароль</p>
-                <input
-                    v-model="password"
-                    type="password"
-                    id="login-password-field"
-                    placeholder="От 6 символов..."
-                    required>
-            </div>
-        </Transition>   
-        <Transition appear name="from-bottom">
-            <div class="remember-grid">
-                <div class="checkbox-container">
-                    <input 
-                        type="checkbox" 
-                        id="login-rememberCheck"
-                        v-model="remember">
-                        <label for="rememberCheck">Запомнить</label>
-                    </input>
-                </div>
-                <button type="submit" class="submit-button" >Войти</button>
-            </div>
-        </Transition>
-    </div>
-</form>
 
 <div class="login-form">
     <Transition appear name="error-fade">
         <div v-if="showErrorMessage" class="error-container" @click="closeError()">
-        
             <img src="../assets/img/danger-18465_256.gif" />
             <div>
                 <p class="error-container-header">{{ currentErrorSummary }}</p>
                 <p v-html="currentErrorMessage"></p>
             </div>
-        
         </div>
     </Transition>
 </div>
@@ -133,21 +37,15 @@ const router = useRouter();
 
 const apiConfig = inject('apiConfig');
 
+const apiUrl = apiConfig.apiUrl;
+
 const showErrorMessage = ref(false);
 const currentErrorSummary = ref(null);
 const currentErrorMessage = ref(null);
 const timeoutId = ref(null);
 
-const username = ref(null);
-const password = ref(null);
-const remember = ref(false);
-
-const registerUsername = ref(null);
-const registerPassword = ref(null);
-const registerPasswordRepeat = ref(null);
-
-const toggleAuth = ref(false);
-
+const authConfig = ref(null);
+const keycloakAuthUri = ref(null);
 
 
 onBeforeMount(() => {
@@ -159,6 +57,7 @@ onBeforeMount(() => {
     if (checkAuth()) {
         router.push("/points")
     }
+    initAuthConfig();
 })
 
 function closeError() {
@@ -183,60 +82,31 @@ function showError(summary, message) {
     timeoutId.value = setTimeout(closeError, 5000);
 }
 
-function validateUsername(nam) {
-    let name = nam.trim();
+async function initAuthConfig() {
+    try {
+        const response = await fetch(apiUrl + "/auth/config");
+        if (!response.ok) {
+            showError(response.status + " " + response.statusText, response.body)
+            return;
+        }
+        const data = response.json();
+        authConfig.value = data;
 
-    if (!name) {
-        return [false, 'Имя пользователя не может быть пустым.'];
-    }
-    if (name.length < 3) {
-        return [false, 'Имя пользователя должно содержать не менее 3 символов.'];
-    }
-    if (name.length > 20) {
-        return [false, 'Имя пользователя должно содержать не более 20 символов.'];
-    }
-    const usernameRegex = /^[a-zA-Z0-9_]+$/;
-    if (!usernameRegex.test(name)) {
-        return [false, 'Имя пользователя может содержать только латинские буквы, цифры и подчеркивания.'];
-    }
+        const url = new URL(`${data.auth_url}/realms/${data.realm}/protocol/openid-connect/auth`)
+        url.searchParams.append('client_id', data.client_id)
+        url.searchParams.append('redirect_uri', encodeURIComponent("http://localhost:80/callback"))
+        url.searchParams.append('response_type', "code")
+        url.searchParams.append('scope', "openid")
 
-    return [true, "OK"];
+        keycloakAuthUri.value = url.toString();
+
+        
+    } catch (error) {
+        showError("Ошибка сети", error)
+    }
 }
 
-
-function validatePassword(pwd) {
-    if (!pwd) {
-        return [false, 'Пароль не может быть пустым.'];
-    }
-    if (pwd.length < 6) {
-        return [false, 'Пароль должен содержать не менее 6 символов.'];
-    }
-    if (pwd.length > 30) {
-        return [false, 'Пароль должен содержать не более 30 символов.'];
-    }
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
-    if (!passwordRegex.test(pwd)) {
-        return [false, 'Пароль должен содержать хотя бы одну латинскую заглавную букву, одну латинскую строчную букву и одну цифру.'];
-    }
-
-    return [true, "OK"];
-}
-
-function validateAndThrow(name, pwd) {
-    const validateUsername_ret = validateUsername(name);
-    if (!validateUsername_ret[0]) {
-        showError("Невалидный никнейм", validateUsername_ret[1])
-        return false;
-    }
-    const validatePassword_ret = validatePassword(pwd);
-    if (!validatePassword_ret[0]) {
-        showError("Невалидный пароль", validatePassword_ret[1])
-        return false;
-    }
-    return true;
-}
-
-async function signin() {
+async function authViaKeycloak() {
     if (localStorage.getItem("authToken") !== null) {
         showError("Ошибка авторизации", "Вы уже авторизованы")
         return;
@@ -244,58 +114,17 @@ async function signin() {
 
     if (!validateAndThrow(username.value, password.value)) return;
 
-    let name = username.value;
-    let pwd = password.value;
+    const name = username.value;
+    const pwd = password.value;
 
     const data = {
         name: name,
         password: pwd
     }
 
-    try {
-        const response = await fetch(
-            apiConfig.apiUrl + '/auth/signin',
-            {
-                'method': 'POST',
-                'headers': {
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify(data)
-            }
-        )
-        
-
-        if (response.ok) {
-            const responseJson = await response.json();
-
-            if (remember.value) {
-                localStorage.setItem("authToken", responseJson.token)
-                localStorage.setItem("authUserName", responseJson.username)
-                localStorage.setItem("authUserId", responseJson.userId)
-            } else {
-                sessionStorage.setItem("authToken", responseJson.token)
-                sessionStorage.setItem("authUserName", responseJson.username)
-                sessionStorage.setItem("authUserId", responseJson.userId)
-            }
-            
-            location.reload();
-        }
-        else {
-            switch (response.status) {
-                case 404:
-                    showError("404 Not Found", "Пользователя с таким именем не найдено")
-                    break;
-                case 400:
-                    showError("400 Bad Request", "Невалидные данные")
-                    break;
-                case 302:
-                    showError("302 Found", "Вы УЖЕ авторизованы")
-                    break;
-            }
-        }
-    } catch (error) {
-        showError("Ошибка сети", error)
-    }
+    
+    
+    // TODO: тут реализовать kk oauth
 }
 
 async function signup() {
