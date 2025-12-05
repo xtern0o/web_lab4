@@ -40,7 +40,7 @@ services:
     container_name: keycloak
     image: quay.io/keycloak/keycloak:latest
     ports:
-      - "${PORT_KEYCLOAK}:8080"
+      - "${PORT_KEYCLOAK}:${PORT_KEYCLOAK}"
     environment:
       KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
       KC_HOSTNAME_PORT: ${PORT_KEYCLOAK}
@@ -54,7 +54,7 @@ services:
     depends_on:
       - postgres
     command:
-      "start-dev --hostname-strict=false --http-enabled=true"
+      "start-dev --http-port=${PORT_KEYCLOAK} --hostname-strict=false --http-enabled=true"
 
 volumes:
   postgres_data:
