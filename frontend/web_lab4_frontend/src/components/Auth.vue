@@ -96,10 +96,10 @@ async function initAuthConfig() {
 
         const url = new URL(`${data.auth_url}/realms/${data.realm}/protocol/openid-connect/auth`)
         url.searchParams.append('client_id', data.client_id)
-        url.searchParams. append('redirect_uri', "http://localhost:80/callback")
+        url.searchParams.append('redirect_uri', `${window.location.origin}/callback`)
         url.searchParams.append('response_type', "code")
         url.searchParams.append('scope', "openid")
-        
+
         keycloakAuthUri.value = url.toString();
         
     } catch (error) {
