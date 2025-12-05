@@ -57,6 +57,10 @@ public class KeycloakService {
                 throw new RuntimeException("Token Response from Keycloak is null");
             }
 
+            for (String key : formData.keySet()) {
+                log.info(key + ": " + formData.getFirst(key));
+            }
+
             return tokenResponseMapper.fromKeycloakTokenResponseToTokenResponse(keycloakTokenResponseDto);
 
         } catch (WebClientResponseException e) {

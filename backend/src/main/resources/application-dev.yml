@@ -1,6 +1,7 @@
 keycloak:
   realm: "web-lab4"
   auth-server-url: "http://localhost:9090"
+  internal-auth-server-url: "http://localhost:9090"
   client-id: "web-lab4-client"
   client-secret: "mYjGCt2kwZYRuaeBqr0pVBbI1LtsXF70"
   token-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/token
@@ -30,8 +31,8 @@ spring:
         jwt:
           issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}
 
-app:
-  jwt:
-    secret: "666JNFKDHFKLDK:jkjf;ldsjfosdijfu943hpfihuifhdsihfdjghoi;dfhg87fhu;gfyhgisfhgudshfuGUPHFuhdfhiphfsdhfdjfh;kdshfsd"
-    token_expiration: 28800000
-    refresh_token_expiration: 252000000
+#app:
+#  jwt:
+#    secret: "666JNFKDHFKLDK:jkjf;ldsjfosdijfu943hpfihuifhdsihfdjghoi;dfhg87fhu;gfyhgisfhgudshfuGUPHFuhdfhiphfsdhfdjfh;kdshfsd"
+#    token_expiration: 28800000
+#    refresh_token_expiration: 252000000

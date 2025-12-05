@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class KeycloakProperties {
     private String realm;
     private String authServerUrl;
+    private String internalAuthServerUrl;
     private String clientId;
     private String clientSecret;
     private String tokenUri;
