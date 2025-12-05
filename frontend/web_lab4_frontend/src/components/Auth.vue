@@ -58,6 +58,8 @@ onBeforeMount(() => {
         router.push("/points")
     }
     initAuthConfig();
+
+    console.log(apiConfig)
 })
 
 function closeError() {
@@ -85,21 +87,20 @@ function showError(summary, message) {
 async function initAuthConfig() {
     try {
         const response = await fetch(apiUrl + "/auth/config");
-        if (!response.ok) {
+        if (! response.ok) {
             showError(response.status + " " + response.statusText, response.body)
             return;
         }
-        const data = response.json();
+        const data = await response.json();
         authConfig.value = data;
 
         const url = new URL(`${data.auth_url}/realms/${data.realm}/protocol/openid-connect/auth`)
         url.searchParams.append('client_id', data.client_id)
-        url.searchParams.append('redirect_uri', encodeURIComponent("http://localhost:80/callback"))
+        url.searchParams. append('redirect_uri', "http://localhost:80/callback")
         url.searchParams.append('response_type', "code")
         url.searchParams.append('scope', "openid")
-
+        
         keycloakAuthUri.value = url.toString();
-
         
     } catch (error) {
         showError("Ошибка сети", error)
