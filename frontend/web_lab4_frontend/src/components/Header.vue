@@ -69,7 +69,7 @@ async function logout() {
             <a>{{ userInfo.name + " (" + userInfo.preferred_username + ")" }}</a>
             <div class="dropdown-content">
                 <p>{{ userInfo.email }}</p>
-                <a href="/admin">Админка</a>
+                <a href="/admin" v-if="authService.isAdmin()">Админка</a>
                 <a @click="logout" class="logout">Выйти</a>
             </div>
         </div>
