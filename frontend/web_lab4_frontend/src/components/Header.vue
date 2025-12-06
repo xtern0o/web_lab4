@@ -69,7 +69,8 @@ async function logout() {
             <a>{{ userInfo.name + " (" + userInfo.preferred_username + ")" }}</a>
             <div class="dropdown-content">
                 <p>{{ userInfo.email }}</p>
-                <a @click="logout">Выйти</a>
+                <a href="/admin">Админка</a>
+                <a @click="logout" class="logout">Выйти</a>
             </div>
         </div>
     </nav>

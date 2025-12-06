@@ -235,6 +235,11 @@ class AuthService {
 
         console.log("auth data saved to localStorage");
     } 
+
+    isAdmin() {
+        if (!this.isAuthenticated()) return false;
+        return this.getUserInfo().roles.map(role => role.toUpperCase()).includes("ADMIN")
+    }
     
 }
 

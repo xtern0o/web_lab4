@@ -52,11 +52,12 @@ defineExpose({ updateAuthState });
 
     <footer>
       <div class="container">
-        <p style="text-align: center; width: 100%; justify-content: center;">три&nbsp;<del>сопли</del>&nbsp;кита, на которых все держится</p>
+        <p style="text-align: center; width: 100%; justify-content: center;">четыре&nbsp;<del>сопли</del>&nbsp;кита, на которых все держится</p>
         <div class="centerized-gallery">
           <img src="./assets/img/vue_im.png"></img>
           <img src="./assets/img/spring_im.png"></img>
           <img src="./assets/img/keycloak_im.png"></img>
+          <img src="./assets/img/docker_im.png"></img>
         </div>
       </div>
     </footer>
