@@ -269,6 +269,7 @@ a.button {
   font-size: 1rem;
   transition: transform 0.1s ease-in-out;
   padding: 0.5rem 1rem;
+  text-decoration: none;
 
   &:hover {
     background-color: @bg-tertiary;
@@ -276,6 +277,10 @@ a.button {
 
   &:active {
     transform: scale(0.95);
+  }
+
+  &:disabled {
+    color: @text-secondary;
   }
 
   &.submit-button {

@@ -5,9 +5,8 @@
 
 <div class="login-form">
     <Transition appear name="from-bottom">
-        <a type="submit" class="button submit-button" :href="keycloakAuthUri">Войти с помощью Keycloak</a>
+        <button type="submit" class="button submit-button" v-on:click="gotoAuth">Войти с помощью Keycloak</button>
     </Transition>
-    
 </div>
 
 
@@ -23,44 +22,22 @@
     </Transition>
 </div>
 
-
-
-
 </template>
 
 <script setup>
-import { inject, onBeforeMount, onMounted, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { authService } from '../services/authService'
 
 
 const router = useRouter();
-
-const apiConfig = inject('apiConfig');
-
-const apiUrl = apiConfig.apiUrl;
 
 const showErrorMessage = ref(false);
 const currentErrorSummary = ref(null);
 const currentErrorMessage = ref(null);
 const timeoutId = ref(null);
 
-const authConfig = ref(null);
-const keycloakAuthUri = ref(null);
-
-
-onBeforeMount(() => {
-    const checkAuth = () => {
-        const hasLocalToken = localStorage.getItem("authToken") !== null;
-        const hasSessionToken = sessionStorage.getItem("authToken") !== null;
-        return hasLocalToken || hasSessionToken;
-    };
-    if (checkAuth()) {
-        router.push("/points")
-    }
-    initAuthConfig();
-
-    console.log(apiConfig)
-})
+const authKeycloakRef = ref(null);
 
 function closeError() {
     showErrorMessage.value = false;
@@ -84,117 +61,14 @@ function showError(summary, message) {
     timeoutId.value = setTimeout(closeError, 5000);
 }
 
-async function initAuthConfig() {
+function gotoAuth() {
     try {
-        const response = await fetch(apiUrl + "/auth/config");
-        if (! response.ok) {
-            showError(response.status + " " + response.statusText, response.body)
-            return;
-        }
-        const data = await response.json();
-        authConfig.value = data;
-
-        const url = new URL(`${data.auth_url}/realms/${data.realm}/protocol/openid-connect/auth`)
-        url.searchParams.append('client_id', data.client_id)
-        url.searchParams.append('redirect_uri', `${window.location.origin}/callback`)
-        url.searchParams.append('response_type', "code")
-        url.searchParams.append('scope', "openid")
-
-        keycloakAuthUri.value = url.toString();
-        
-    } catch (error) {
-        showError("Ошибка сети", error)
+        authService.login();
+    } catch (err) {
+        showError("Ошибка перенаправления", err)
     }
 }
 
-async function authViaKeycloak() {
-    if (localStorage.getItem("authToken") !== null) {
-        showError("Ошибка авторизации", "Вы уже авторизованы")
-        return;
-    }
-
-    if (!validateAndThrow(username.value, password.value)) return;
-
-    const name = username.value;
-    const pwd = password.value;
-
-    const data = {
-        name: name,
-        password: pwd
-    }
-
-    
-    
-    // TODO: тут реализовать kk oauth
-}
-
-async function signup() {
-    if (localStorage.getItem("authToken") !== null) {
-        showError("Ошибка авторизации", "Вы уже авторизованы")
-        return;
-    }
-
-    let name = registerUsername.value;
-    let pwd = registerPassword.value;
-    let repeatPwd = registerPasswordRepeat.value;
-
-    if (!(pwd === repeatPwd)) {
-        showError("Некорректный пароль", "Пароли не совпадают")
-        return;
-    }
-
-    if (!validateAndThrow(name, pwd)) return;
-
-    const data = {
-        name: name,
-        password: pwd
-    }
-
-    try {
-        const response = await fetch(
-            apiConfig.apiUrl + '/auth/signup',
-            {
-                'method': 'POST',
-                'headers': {
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify(data)
-            }
-        )
-        
-
-        if (response.ok) {
-            const responseJson = await response.json();
-
-            if (remember.value) {
-                localStorage.setItem("authToken", responseJson.token)
-                localStorage.setItem("authUserName", responseJson.username)
-                localStorage.setItem("authUserId", responseJson.userId)
-            } else {
-                sessionStorage.setItem("authToken", responseJson.token)
-                sessionStorage.setItem("authUserName", responseJson.username)
-                sessionStorage.setItem("authUserId", responseJson.userId)
-            }
-            
-            location.reload();
-        }
-        else {
-            switch (response.status) {
-                case 409:
-                    showError("409 Conflict", "Пользователь с таким именем уже существует")
-                    break;
-                case 400:
-                    showError("400 Bad Request", "Не нужно посылать плохие запросы")
-                    break;
-                case 302:
-                    showError("302 Found", "Вы УЖЕ авторизованы")
-                    break;
-            }
-        }
-    } catch (error) {
-        showError("Ошибка сети", error)
-    }
-}
 
 
 </script>
