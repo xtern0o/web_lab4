@@ -1,0 +1,32 @@
+keycloak:
+  realm: "web-lab4"
+  auth-server-url: "http://localhost:9090"
+  internal-auth-server-url: "http://localhost:9090"
+  client-id: "web-lab4-client"
+  client-secret: "mYjGCt2kwZYRuaeBqr0pVBbI1LtsXF70"
+  token-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}/protocol/openid-connect/token
+
+spring:
+  application:
+    name: web_lab4
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/web_lab4_db
+    username: maxkarn
+    password: maxkarn
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${keycloak.auth-server-url}/realms/${keycloak.realm}

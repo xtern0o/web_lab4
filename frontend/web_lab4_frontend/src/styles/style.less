@@ -254,6 +254,46 @@ button {
 
 }
 
+a.button {
+  display: flex;
+  min-height: 40px;
+  min-width: 100px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid @bg-tertiary;
+  border-radius: 8px;
+  background-color: @bg-secondary;
+  cursor: pointer;
+  color: @text-primary;
+  font-size: 1rem;
+  transition: transform 0.1s ease-in-out;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+
+  &:hover {
+    background-color: @bg-tertiary;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    color: @text-secondary;
+  }
+
+  &.submit-button {
+    color: @accent;
+    transition: transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  }
+
+  &.submit-button:hover {
+    box-shadow: 0px 0px 10px @accent;
+  }
+}
+
 .field-invalid {
   border-color: @error;
 }
@@ -402,7 +442,9 @@ header {
             padding-top: 1rem;
             display: none;
             position: absolute;
-            background-color: transparent;
+            border: 1px solid @bg-tertiary;
+            border-radius: 4px;
+            background-color: @bg-primary;
             
             min-width: 160px;
             z-index: 10;
@@ -418,11 +460,12 @@ header {
               text-align: left;
               cursor: pointer;
               opacity: 100%;
-              border: 1px solid @bg-tertiary;
-              border-radius: 4px;
-              background-color: @bg-primary;
 
               &:hover {
+                background-color: @bg-tertiary;
+                color: @accent;
+              }
+              &.logout:hover {
                 background-color: @bg-tertiary;
                 color: @error;
               }

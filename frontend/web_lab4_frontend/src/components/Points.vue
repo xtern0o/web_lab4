@@ -100,7 +100,7 @@
               </div>
             </TransitionGroup>
 			
-			      <p class="card card-body" v-if="!isAuth" style="text-align: center;">Тут ничего нет, потому что вы не авторизованы!</p>
+			<p class="card card-body" v-if="!isAuthenticated" style="text-align: center;">Тут ничего нет, потому что вы не авторизованы!</p>
             <p class="card card-body" v-else-if="points.length === 0" style="text-align: center;">Точек пока нет. Добавьте их!</p>
         </div>
       </div>
@@ -176,10 +176,15 @@
 </style>
 
 <script setup>
-import { inject, onMounted, ref, watch } from 'vue';
+import axios from 'axios';
+import api from '../services/api'
+import { onMounted, ref, watch, onBeforeMount } from 'vue';
+import { useRoute } from 'vue-router'
+import { authService } from '../services/authService';
 
-const isAuth = localStorage.getItem("authToken") !== null || sessionStorage.getItem("authToken") !== null
-const apiConfig = inject('apiConfig');
+const isAuthenticated = ref(false);
+
+const route = useRoute();
 
 const x = ref(null);
 const y = ref(null);
@@ -188,10 +193,21 @@ const r = ref(null);
 const showErrorMessage = ref(false);
 const currentErrorSummary = ref(null);
 const currentErrorMessage = ref(null);
-
 const timeoutId = ref(null);
 
 const points = ref([]);
+
+function updateAuthState() {
+    isAuthenticated.value = authService.isAuthenticated();
+}
+
+onBeforeMount(() => {
+    updateAuthState();
+});
+
+watch(() => route.path, () => {
+    updateAuthState();
+});
 
 
 watch(r, (newR, oldR) => {
@@ -280,15 +296,12 @@ function validateR() {
 }
 
 function showError(summary, message) {
-  if (timeoutId.value) {
-    clearTimeout(timeoutId.value);
-  }
+  if (timeoutId.value) clearTimeout(timeoutId.value);
 
   showErrorMessage.value = true;
   currentErrorSummary.value = summary;
   currentErrorMessage.value = message;
   timeoutId.value = setTimeout(closeError, 3000);
-  
 }
 
 function validateAndShowError() {
@@ -322,64 +335,58 @@ function clearFields() {
 }
 
 async function submitPoint() {
-	if (!goIfAuth()) return;
+	if (!isAuthenticated.value) {
+		showError(
+				"Ошибка авторизации", 
+				"Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>"
+			);
+		return;
+	} 
 
 	if (!validateAndShowError()) return;
 
-	let pointDto = {
-		"x": x.value,
-		"y": y.value,
-		"r": r.value
-	}
-
 	try {
-		const response = await fetch(apiConfig.apiUrl + "/points", {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${getAuth().token}`
-			},
-			body: JSON.stringify(pointDto)
+		const response = await api.post("/points", {
+			x: x.value,
+			y: y.value,
+			r: r.value
 		});
 
-		if (response.ok) {
-			const pointResponse = await response.json();
+		const data = response.data;
 
-			points.value.unshift(
-				{
-					"id": pointResponse.id,
-					"hit": pointResponse.hit, 
-					"x": pointDto.x,
-					"y": pointDto.y,
-					"r": pointDto.r,
-					"user": pointResponse.userId,
-					"date": formatDate(pointResponse.createdAt)
-				}
-			)
+		points.value.unshift(
+			{
+				"id": data.id,
+				"hit": data.hit, 
+				"x": x.value,
+				"y": y.value,
+				"r": r.value,
+				"user": data.userId,
+				"date": formatDate(data.createdAt)
+			}
+		)
 
-			const absCoords = systemToAbsCoord(pointDto.x, pointDto.y);
-			drawDot(absCoords.x, absCoords.y, pointResponse.hit)
+		const absCoords = systemToAbsCoord(x.value, y.value);
+		drawDot(absCoords.x, absCoords.y, data.hit)
 
-			console.log(pointResponse)
-		} else {
-			switch (response.status) {
-				case 400:
-					showError("Bad Request", (await response.json()).error)
-					break;
-				case 401:
-					showError("Ошибка авторизации", "Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>")
-					localStorage.clear()
-					sessionStorage.clear()
-					break;
+		console.log(data)		
+	} catch (error) {
+		if (error.response) {
+			switch (error.response.status) {
+			case 400:
+				showError("Bad Request", (await response.json()).error)
+				break;
+			case 401:
+				showError("Ошибка авторизации", "Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>")
 				
+				break;		
 			}
 		}
+		else {
+			showError("Ошибка сети", error);
 
-		
-	} catch (error) {
-		showError("Ошибка сети", error);
+		}
 	}
-	
 }
 
 function drawCoordinateSystem() {
@@ -467,7 +474,13 @@ function systemToAbsCoord(x, y) {
 }
 
 function canvasClick(event) {
-	if (!goIfAuth()) return;
+	if (!isAuthenticated.value) {
+		showError(
+				"Ошибка авторизации", 
+				"Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>"
+			);
+		return;
+	} 
 
 	const rValid = validateR();
 	if (!rValid[0]) {
@@ -491,78 +504,45 @@ function canvasClick(event) {
 
 	x.value = systemCoords.x;
 	y.value = systemCoords.y;
+
 	submitPoint();
 
 }
 
-function goIfAuth() {
-	if (!isAuth) {
-		showError(
-			"Ошибка авторизации", 
-			"Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>"
-		);
-		return false;
-	}
-	return true;
-}
-
-function getAuth() {
-	if (!isAuth) return null;
-	const authToken = localStorage.getItem("authToken");
-	if (authToken !== null) return {
-		username: localStorage.getItem("authUsername"),
-		token: authToken
-	}
-	const sessionAuthToken = sessionStorage.getItem("authToken");
-
-	if (sessionAuthToken !== null) {
-		return {
-			username: sessionStorage.getItem("authUsername"),
-			token: sessionAuthToken
-		}
-	}
-	return null;
-}
-
 async function getAllPoints() {
 	try {
-		const response = await fetch(
-			apiConfig.apiUrl + "/points", 
-			{
-				method: 'GET',
-				headers: {
-					'Authorization': `Bearer ${getAuth().token}`
+		const response = await api.get("/points")
+
+		const pointsJson = response.data;
+		pointsJson.forEach(point => {
+			points.value.unshift(
+				{
+					"id": point.id,
+					"hit": point.hit, 
+					"x": point.x,
+					"y": point.y,
+					"r": point.r,
+					"user": point.userId,
+					"date": formatDate(point.createdAt)
 				}
-			}
-		)
-		if (response.ok) {
-			const pointsJson = await response.json()
-			pointsJson.forEach(point => {
-				points.value.unshift(
-					{
-						"id": point.id,
-						"hit": point.hit, 
-						"x": point.x,
-						"y": point.y,
-						"r": point.r,
-						"user": point.userId,
-						"date": formatDate(point.createdAt)
-					}
-				)
-			});
-		} else {
-			throw new Error("Ошибка сети", response.status)
-		}
+			)
+		});
+		
+		
 	} catch (error) {
-		switch(error.message) {
-			case 400:
-				showError("Bad Request", (await response.json()).error)
-				break;
-			case 401:
-				showError("Ошибка авторизации", "Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>")
-				localStorage.clear()
-				sessionStorage.clear()
-				break;
+		if (error.response) {
+			switch(error.response.status) {
+				case 400:
+					showError("Bad Request", poinstJson.error)
+					break;
+				case 401:
+					showError("Ошибка авторизации", "Вы не можете выполнить это действие. <a href='/auth'>Авторизуйтесь</a>")
+					// await authService.logout()
+					break;
+			}
+		}
+		else {
+			showError("Ошибка сети", error);
 		}
 	}
 }
@@ -574,7 +554,6 @@ function refreshCanvasPoints() {
   })
 }
 	
-
 
 function refreshCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -622,16 +601,18 @@ onMounted(() => {
 
 	drawCoordinateSystem();
 
-	if (!isAuth) {
+	if (!isAuthenticated.value) {
 		canvas.style.filter = 'blur(5px)'
+	} else {
+		getAllPoints()
+			.then(() => {
+				refreshCanvasPoints()
+			})
+			.catch(error => {
+				showError("Ошибка получения точек", error)
+			})
 	}
 
-	getAllPoints()
-		.then(() => {
-			refreshCanvasPoints()
-		})
-		.catch(error => {
-			showError("Ошибка получения точек", error)
-		})
+	
 })
 </script>

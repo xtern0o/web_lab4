@@ -37,3 +37,4 @@ out/
 
 backend/.env
 .env
+application-dev.yml

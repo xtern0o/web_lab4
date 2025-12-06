@@ -1,55 +1,34 @@
 <script setup>
 import Header from './components/Header.vue';
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
+import { authService } from './services/authService';
 
 const router = useRouter();
-
-const authUserName = ref('');
-const isAuth = ref(false);
-
-const getUserName = () => {
-    const localName = localStorage.getItem("authUserName");
-    const sessionName = sessionStorage.getItem("authUserName");
-    return localName || sessionName || '';
-};
-
-const checkAuth = () => {
-    const hasLocalToken = localStorage.getItem("authToken") !== null;
-    const hasSessionToken = sessionStorage.getItem("authToken") !== null;
-    return hasLocalToken || hasSessionToken;
-};
 
 const navigationLinks = computed(() => {
 	const links = [
 		{ name: 'Главная', path: '/' },
 		{ name: 'Точки', path: '/points' },
 	];
-	
-	if (!isAuth.value) {
-		links.push({ name: 'Войти', path: '/auth' });
-	}
+
+  if (!authService.isAuthenticated) {
+    links.push({ name: 'Войти', path: '/auth' });
+  }
 	
 	return links;
 });
 
 onMounted(() => {
-	isAuth.value = checkAuth();
-	authUserName.value = getUserName();
+
 });
 
 const updateAuthState = () => {
-	isAuth.value = checkAuth();
-	authUserName.value = getUserName();
+
 };
 
 const logout = () => {
-	localStorage.removeItem("authToken");
-	localStorage.removeItem("authUserName");
-	sessionStorage.removeItem("authToken");
-	sessionStorage.removeItem("authUserName");
-	isAuth.value = false;
-	authUserName.value = '';
+	
 
 	router.push('/auth');
 };
@@ -73,7 +52,13 @@ defineExpose({ updateAuthState });
 
     <footer>
       <div class="container">
-        <p>some footer info</p>
+        <p style="text-align: center; width: 100%; justify-content: center;">четыре&nbsp;<del>сопли</del>&nbsp;кита, на которых все держится</p>
+        <div class="centerized-gallery">
+          <img src="./assets/img/vue_im.png"></img>
+          <img src="./assets/img/spring_im.png"></img>
+          <img src="./assets/img/keycloak_im.png"></img>
+          <img src="./assets/img/docker_im.png"></img>
+        </div>
       </div>
     </footer>
   </div>
@@ -81,4 +66,26 @@ defineExpose({ updateAuthState });
 
 <style lang="less">
 @import './styles/style.less';
+@import './styles/variables.less';
+
+.centerized-gallery {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  
+  * {
+    height: 30px;
+    width: auto;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  @media(max-width: @width-phone) {
+    flex-direction: column;
+  }
+}
+
 </style>
