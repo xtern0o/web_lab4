@@ -37,8 +37,6 @@ const currentErrorSummary = ref(null);
 const currentErrorMessage = ref(null);
 const timeoutId = ref(null);
 
-const authKeycloakRef = ref(null);
-
 function closeError() {
     showErrorMessage.value = false;
     currentErrorSummary.value = null;
@@ -69,6 +67,11 @@ function gotoAuth() {
     }
 }
 
+onBeforeMount(() => {
+    if (authService.isAuthenticated()) {
+        router.push('/points');
+    }
+})
 
 
 </script>

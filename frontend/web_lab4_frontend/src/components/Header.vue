@@ -1,31 +1,14 @@
 <script setup>
-import { ref, computed, onMounted, inject } from 'vue';
-import { useRouter } from 'vue-router'
+import { ref, computed, onBeforeMount, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router'
+import { authService } from '../services/authService';
 
 const router = useRouter();
-const apiConfig = inject('apiConfig');
+const route = useRoute();
 
-const authUserName = ref('');
-const authUserId = ref('')
-const isAuth = ref(false);
+const userInfo = ref(null);
 
-const getUserName = () => {
-    const localName = localStorage.getItem("authUserName");
-    const sessionName = sessionStorage.getItem("authUserName");
-    return localName || sessionName || '';
-};
-
-const getUserId = () => {
-    const localName = localStorage.getItem("authUserId");
-    const sessionName = sessionStorage.getItem("authUserId");
-    return localName || sessionName || '';
-}
-
-const checkAuth = () => {
-    const hasLocalToken = localStorage.getItem("authToken") !== null;
-    const hasSessionToken = sessionStorage.getItem("authToken") !== null;
-    return hasLocalToken || hasSessionToken;
-};
+const isAuthenticated = ref(false);
 
 const navigationLinks = computed(() => {
 	const links = [
@@ -33,51 +16,34 @@ const navigationLinks = computed(() => {
 		{ name: 'Точки', path: '/points' },
 	];
 	
-	if (!isAuth.value) {
-		links.push({ name: 'Войти', path: '/auth' });
-	}
+	if (!isAuthenticated.value) {
+        links.push({ name: 'Войти', path: '/auth' });
+    }
 	
 	return links;
 });
 
-onMounted(() => {
-	isAuth.value = checkAuth();
-	authUserName.value = getUserName();
-    authUserId.value = getUserId();
+function updateAuthState() {
+    isAuthenticated.value = authService.isAuthenticated();
+    if (isAuthenticated.value) userInfo.value = authService.getUserInfo();
+    else userInfo.value = null;
+    console.log("authState updated: " + isAuthenticated.value);
+    console.log(userInfo.value)
+}
+
+onBeforeMount(() => {
+    updateAuthState();
 });
 
-function updateAuthState() {
-	isAuth.value = checkAuth();
-	authUserName.value = getUserName();
-    authUserId.value = getUserId();
-};
+watch(() => route.path, () => {
+    updateAuthState();
+});
 
 async function logout() {
-	localStorage.removeItem("authToken");
-	localStorage.removeItem("authUserName");
-    localStorage.removeItem("authUserId");
-	sessionStorage.removeItem("authToken");
-	sessionStorage.removeItem("authUserName");
-    sessionStorage.removeItem("authUserId");
-	isAuth.value = false;
-	authUserName.value = '';
-	router.push('/auth');
-
-    try {
-        const response = await fetch(apiConfig.apiUrl + "/auth/logout", {
-            method: 'GET',
-        });
-        if (response.ok) {
-            console.log('ТОКЕН В БЛЕКЛИСТЕ УРА')
-        }
-    } catch (error) {
-        console.log('Connection Error')
-    }
-    
-
+	authService.logout();
+    updateAuthState();
 };
 
-defineExpose({ updateAuthState });
 </script>
 
 <template>
@@ -99,9 +65,10 @@ defineExpose({ updateAuthState });
             {{ link.name }}
         </router-link>
 
-        <div class="navbar-nav-item-user" v-if="isAuth">
-            <a>{{ authUserName }} ({{ authUserId }})</a>
+        <div class="navbar-nav-item-user" v-if="isAuthenticated && userInfo">
+            <a>{{ userInfo.name + " (" + userInfo.preferred_username + ")" }}</a>
             <div class="dropdown-content">
+                <p>{{ userInfo.email }}</p>
                 <a @click="logout">Выйти</a>
             </div>
         </div>

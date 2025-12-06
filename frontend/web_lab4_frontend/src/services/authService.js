@@ -105,8 +105,18 @@ class AuthService {
         if (!token) return false;
 
         if (this.expiresAt && Date.now() > this.expiresAt) {
-            console.log("access token expired")
-            return false;
+            console.log("access token expired. trying tu refresh...");
+            try {
+                this.refreshAccessToken();
+            } catch (err) {
+                console.error("failed to refresh access token:", err);
+                return false;
+            }
+            if (Date.now() > this.expiresAt) {
+                console.error("access token is still expired after refresh");
+                return false;
+            }
+            return true;
         }
 
         return true;
@@ -117,10 +127,6 @@ class AuthService {
             const config = await configService.loadConfig()
 
             const redirectUri = `${window.location.origin}/callback`;
-
-            console.log('🔵 Loaded config:', config);
-            console.log('🔵 authUrl:', config.auth_url);
-            console.log('🔵 clientId:', config.client_id);
 
             const authUrl = new URL(`${config.auth_url}/realms/${config.realm}/protocol/openid-connect/auth`);
             authUrl.searchParams.set("client_id", config.client_id);
@@ -205,6 +211,8 @@ class AuthService {
 
     async logout() {
         this.clearTokens();
+        location.reload();
+        console.log("user logged out");
     }
 
     saveData(data) {

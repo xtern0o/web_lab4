@@ -1,7 +1,8 @@
 <script setup>
 import Header from './components/Header.vue';
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router'
+import { authService } from './services/authService';
 
 const router = useRouter();
 
@@ -10,8 +11,10 @@ const navigationLinks = computed(() => {
 		{ name: 'Главная', path: '/' },
 		{ name: 'Точки', path: '/points' },
 	];
-	
-	links.push({ name: 'Войти', path: '/auth' });
+
+  if (!authService.isAuthenticated) {
+    links.push({ name: 'Войти', path: '/auth' });
+  }
 	
 	return links;
 });

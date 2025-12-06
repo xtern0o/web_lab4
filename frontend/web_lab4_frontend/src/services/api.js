@@ -2,7 +2,7 @@ import axios from "axios";
 import { authService } from "./authService";
 
 const api = axios.create({
-    baseURL: authService.apiUrl,
+    baseURL: import.meta.env.VITE_API_URL || '/api',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -19,3 +19,5 @@ api.interceptors.request.use(
         return Promise.reject(error);
     }
 )
+
+export default api;
