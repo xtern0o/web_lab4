@@ -346,7 +346,7 @@ async function submitPoint() {
 	if (!validateAndShowError()) return;
 
 	try {
-		const response = await api.post(authService.apiUrl + "/points", {
+		const response = await api.post("/points", {
 			x: x.value,
 			y: y.value,
 			r: r.value
@@ -511,7 +511,7 @@ function canvasClick(event) {
 
 async function getAllPoints() {
 	try {
-		const response = await api.get(authService.apiUrl + "/points")
+		const response = await api.get("/points")
 
 		const pointsJson = response.data;
 		pointsJson.forEach(point => {
