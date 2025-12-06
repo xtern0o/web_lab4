@@ -52,7 +52,12 @@ defineExpose({ updateAuthState });
 
     <footer>
       <div class="container">
-        <p>some footer info</p>
+        <p style="text-align: center; width: 100%; justify-content: center;">три&nbsp;<del>сопли</del>&nbsp;кита, на которых все держится</p>
+        <div class="centerized-gallery">
+          <img src="./assets/img/vue_im.png"></img>
+          <img src="./assets/img/spring_im.png"></img>
+          <img src="./assets/img/keycloak_im.png"></img>
+        </div>
       </div>
     </footer>
   </div>
@@ -60,4 +65,26 @@ defineExpose({ updateAuthState });
 
 <style lang="less">
 @import './styles/style.less';
+@import './styles/variables.less';
+
+.centerized-gallery {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  
+  * {
+    height: 30px;
+    width: auto;
+    flex-shrink: 0;
+    object-fit: contain;
+  }
+
+  @media(max-width: @width-phone) {
+    flex-direction: column;
+  }
+}
+
 </style>
