@@ -37,4 +37,8 @@ public class PointService {
         );
         return pointMapper.toResponseDTO(savedPoint);
     }
+
+    public void deleteAllPoints() {
+        pointRepository.deleteAllInBatch();
+    }
 }

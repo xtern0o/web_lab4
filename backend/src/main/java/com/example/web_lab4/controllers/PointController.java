@@ -37,4 +37,10 @@ public class PointController {
         return pointService.createPoint(requestDTO, (UserEntity) currentUser);
     }
 
+    @DeleteMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteAllPoints() {
+        pointService.deleteAllPoints();
+    }
+
 }
